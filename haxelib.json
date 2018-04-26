@@ -1,0 +1,11 @@
+{
+	"name": "sfhx",
+	"url": "https://yal.cc",
+	"license": "LGPL",
+	"tags": [],
+	"description": "Mysterious tools to aid with writing 'super-flat' CustomJSGenerator targets in Haxe",
+	"version": "0.8.0",
+	"releasenote": "",
+	"contributors": ["YellowAfterlife"],
+	"dependencies": {}
+}
