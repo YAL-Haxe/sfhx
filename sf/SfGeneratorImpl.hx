@@ -20,6 +20,7 @@ class SfGeneratorImpl {
 	/** JS Generator */ 
 	public var apiTypes:Array<Type>;
 	public var apiMain:Null<TypedExpr>;
+	public var outputPath:String;
 	
 	public var typeList:Array<SfType> = [];
 	public var typeMap:SfTypeMap<SfType> = new SfTypeMap();
@@ -304,19 +305,20 @@ class SfGeneratorImpl {
 		return null;
 	}
 	
-	public function new() {
+	public function new(path:String) {
+		outputPath = path;
 		SfCore.sfGenerator = cast(this, SfGenerator);
 		var conf = new SfConfig();
 		SfCore.sfConfig = conf;
 	}
 	
-	public function compile(apiTypes:Array<Type>, apiMain:Null<TypedExpr>, outPath:String) {
+	public function compile(apiTypes:Array<Type>, apiMain:Null<TypedExpr>) {
 		this.apiTypes = apiTypes;
 		this.apiMain = apiMain;
 		buildTypes();
 		buildFields();
 		if (SfCore.sfConfig.dump == "post") File.saveContent("sf.sfdump", SfDump.get());
-		printTo(outPath);
+		printTo(outputPath);
 		var path2 = SfCore.sfConfig.also;
 		if (path2 != null) printTo(path2);
 	}

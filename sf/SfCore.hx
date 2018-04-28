@@ -34,11 +34,11 @@ class SfCore {
 	/** Macros entrypoint */
 	private static function main() {
 		#if !sf_no_gen
-		var sfg = new SfGenerator();
 		if (Context.defined("js")) {
 			haxe.macro.Compiler.setCustomJSGenerator(function(api:haxe.macro.JSGenApi) {
 				try {
-					sfg.compile(api.types, api.main, api.outputFile);
+					var sfg = new SfGenerator(api.outputFile);
+					sfg.compile(api.types, api.main);
 				} catch (e:Dynamic) {
 					Sys.println("Stack: " + haxe.CallStack.toString(haxe.CallStack.exceptionStack()));
 					Sys.println("Tag: " + Std.string(xt));
@@ -50,6 +50,9 @@ class SfCore {
 				}
 			});
 		} else {
+			var outPath = haxe.macro.Compiler.getOutput();
+			if (!Context.defined("no-output")) outPath += ".cs";
+			var sfg = new SfGenerator(outPath);
 			typesFound = [];
 			Context.onGenerate(function(types) {
 				typesFound = types;
@@ -71,9 +74,7 @@ class SfCore {
 					if (r != null) types.push(r);
 				}
 				//
-				var outPath = haxe.macro.Compiler.getOutput();
-				if (!Context.defined("no-output")) outPath += ".cs";
-				sfg.compile(types, null, outPath);
+				sfg.compile(types, null);
 			});
 		}
 		#end
