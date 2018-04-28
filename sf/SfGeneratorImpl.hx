@@ -305,16 +305,16 @@ class SfGeneratorImpl {
 		return null;
 	}
 	
-	public function new(path:String) {
-		outputPath = path;
+	public function new() {
 		SfCore.sfGenerator = cast(this, SfGenerator);
 		var conf = new SfConfig();
 		SfCore.sfConfig = conf;
 	}
 	
-	public function compile(apiTypes:Array<Type>, apiMain:Null<TypedExpr>) {
+	public function compile(apiTypes:Array<Type>, apiMain:Null<TypedExpr>, outputPath:String) {
 		this.apiTypes = apiTypes;
 		this.apiMain = apiMain;
+		this.outputPath = outputPath;
 		buildTypes();
 		buildFields();
 		if (SfCore.sfConfig.dump == "post") File.saveContent("sf.sfdump", SfDump.get());
