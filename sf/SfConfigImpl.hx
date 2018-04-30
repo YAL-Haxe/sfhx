@@ -56,20 +56,35 @@ class SfConfigImpl {
 		//
 	}
 	
+	private static var value_1:Map<String, String> = new Map();
+	private static function value(s:String):String {
+		if (value_1.exists(s)) return value_1[s];
+		var v = Context.definedValue(s);
+		if (v != null) return v;
+		// if things didn't work out, see if it's about dashes<->underscores:
+		if (s.indexOf("-") >= 0) {
+			v = Context.definedValue(StringTools.replace(s, "-", "_"));
+		} else if (s.indexOf("_") >= 0) {
+			v = Context.definedValue(StringTools.replace(s, "_", "-"));
+		}
+		value_1.set(s, v);
+		return v;
+	}
+	
 	public static function bool(name:String, def:Bool = false):Bool {
-		var v = Context.definedValue(name);
+		var v = value(name);
 		if (v != null) {
 			return v != "0" && v != "false";
 		} else return def;
 	}
 	
 	public static function string(name:String, def:String = null):String {
-		var v = Context.definedValue(name);
+		var v = value(name);
 		if (v != null) return v; else return def;
 	}
 	
 	public static function int(name:String, def:Int = 0):Int {
-		var s = Context.definedValue(name);
+		var s = value(name);
 		var v = s != null ? Std.parseInt(s) : null;
 		return v != null ? v : def;
 	}
