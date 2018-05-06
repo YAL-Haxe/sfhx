@@ -557,6 +557,48 @@ class SfExprTools {
 		return expr.mod(rd);
 	}
 	
+	/** Modifies in place, (expr) -> (expr + delta) */
+	public static function adjustByInt(expr:SfExpr, stack:SfExprList, delta:Int):Void {
+		switch (expr.def) {
+			case SfConst(TInt(i)): {
+				expr.def = SfConst(TInt(i + delta));
+				return;
+			};
+			default:
+		}
+		//
+		if (stack != null && stack.length > 0)
+		do switch (stack[0].def) {
+			case SfBinop(o, a, b): {
+				var mult:Int;
+				switch (o) {
+					// ((a + 1) > 1) -> (a > 0)
+					case OpEq | OpNotEq | OpLt | OpLte | OpGt | OpGte: mult = -1;
+					case OpAdd: mult = 1; // (a + 1) + 1 -> (a + 2)
+					case OpSub: mult = -1; // ((a + 1) - 2) -> (a - 1)
+					default: continue;
+				}
+				var c = a == expr ? b : a;
+				switch (c.def) {
+					case SfConst(TInt(k)): {
+						c.def = SfConst(TInt(k + delta * mult));
+						return;
+					};
+					default:
+				}
+			};
+			default:
+		} while (false);
+		//
+		expr.def = SfBinop(delta > 0 ? OpAdd : OpSub,
+			expr.mod(expr.def),
+			expr.mod(SfConst(TInt(delta > 0 ? delta : -delta)))
+		);
+		if (stack != null && !expr.isWrapped(stack)) {
+			expr.def = SfParenthesis(expr.mod(expr.def));
+		}
+	}
+	
 	public static function countThis(expr:SfExpr):Int {
 		var found:Int = 0;
 		function seek(e:SfExpr, w, func:SfExprIter):Void {
