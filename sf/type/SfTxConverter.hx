@@ -68,7 +68,10 @@ class SfTxConverter {
 							var f = c.staticMap[cf.name];
 							if (f != null) {
 								rd = SfStaticField(c, f);
-							} else rd = SfDynamicField(new SfExpr(d, SfTypeExpr(c)), cf.name);
+							} else {
+								// probably untyped Class.field, suspicious!
+								rd = SfDynamicField(new SfExpr(d, SfTypeExpr(c)), cf.name);
+							}
 						} else rd = SfDynamicField(new SfExpr(d, SfDynamic(ct.name, [])), cf.name);
 					};
 					case FInstance(_ct, _, _cf): {

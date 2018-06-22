@@ -46,7 +46,7 @@ class SfFieldImpl extends SfStruct {
 	}
 }
 
-private typedef TypeField = {
+typedef TypeField = {
 	var name:String;
 	var type:Type;
 	var doc:Null<String>;
