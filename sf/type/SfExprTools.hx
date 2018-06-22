@@ -358,14 +358,15 @@ class SfExprTools {
 		}
 		#if (macro)
 		var stack = haxe.CallStack.callStack();
-		var depth = stack.length;
+		/*var depth = stack.length;
 		if (depth > 3) {
 			var loc = switch (stack[depth - 3]) {
 				case FilePos(_, file, line): file.substring(file.lastIndexOf("sf/")) + ":" + line;
 				default: Std.string(stack[depth - 3]);
 			}
 			text = '[$loc] ' + text;
-		}
+		}*/
+		text += haxe.CallStack.toString(stack);
 		Context.error(text, getPos(expr));
 		#else
 		throw text;
@@ -413,6 +414,14 @@ class SfExprTools {
 	
 	public static inline function getType(expr:SfExpr):Type {
 		return expr.data.t;
+	}
+	
+	public static function getTypeNz(expr:SfExpr):Type {
+		var t = getType(expr);
+		return switch (t) {
+			case TAbstract(_.get() => { name: "Null" }, [t1]): t1;
+			default: t;
+		}
 	}
 	
 	public static inline function setType(expr:SfExpr, t:Type):Void {
@@ -474,7 +483,7 @@ class SfExprTools {
 			case SfLocal(_): true;
 			case SfArrayAccess(q, i): isSimple(q) && isSimple(i);
 			case SfStaticField(_, _): true;
-			case SfInstField(q, _): isSimple(q);
+			case SfInstField(q, _), SfDynamicField(q, _): isSimple(q);
 			case SfBinop(o, a, b): switch (o) {
 				case Binop.OpAssign, Binop.OpAssignOp(_): false;
 				default: isSimple(a) && isSimple(b);
@@ -559,6 +568,7 @@ class SfExprTools {
 	
 	/** Modifies in place, (expr) -> (expr + delta) */
 	public static function adjustByInt(expr:SfExpr, stack:SfExprList, delta:Int):Void {
+		if (delta == 0) return;
 		switch (expr.def) {
 			case SfConst(TInt(i)): {
 				expr.def = SfConst(TInt(i + delta));
