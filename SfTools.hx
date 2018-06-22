@@ -53,7 +53,7 @@ class SfTools {
 	}
 	
 	/** raw("code", ...args) */
-	public static macro function raw(e:Array<Expr>):Expr {
+	public static macro function raw(e:Array<Expr>):ExprOf<Dynamic> {
 		var pos = Context.currentPos();
 		if (e.length < 1) Context.error("raw() requires at least one argument.", pos);
 		var raw = macro untyped __raw__;
