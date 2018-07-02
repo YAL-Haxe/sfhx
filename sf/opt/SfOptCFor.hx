@@ -46,6 +46,9 @@ class SfOptCFor extends SfOptImpl {
 							case SfReturn(_): continue;
 							case SfTry(_, _): continue;
 							case SfThrow(_): continue;
+							#if (gml)
+							case SfCall(_, _): continue; // illegal now
+							#end
 							default:
 						}
 						// Post-action cannot be a block:
