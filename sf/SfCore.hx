@@ -34,6 +34,7 @@ class SfCore {
 	/** Macros entrypoint */
 	private static function main() {
 		#if !sf_no_gen
+		SfGenerator.main();
 		if (Context.defined("js")) {
 			var sfg = new SfGenerator();
 			haxe.macro.Compiler.setCustomJSGenerator(function(api:haxe.macro.JSGenApi) {
