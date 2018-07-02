@@ -57,7 +57,7 @@ class SfConfigImpl {
 	}
 	
 	private static var value_1:Map<String, String> = new Map();
-	private static function value(s:String):String {
+	public static function value(s:String):String {
 		if (value_1.exists(s)) return value_1[s];
 		var v = Context.definedValue(s);
 		if (v != null) return v;
@@ -87,5 +87,25 @@ class SfConfigImpl {
 		var s = value(name);
 		var v = s != null ? Std.parseInt(s) : null;
 		return v != null ? v : def;
+	}
+	
+	/**
+	 * ("1.4", "2.0") -> -1
+	 * ("2.3.4", "2.3") -> 1
+	 * ("2.3.1", "2.3.1") -> 0
+	 */
+	public static function compare(a:String, b:String):Int {
+		if (a == null) a = "";
+		if (b == null) b = "";
+		var aw = a.split(".");
+		var bw = b.split(".");
+		var an = aw.length;
+		var bn = bw.length;
+		for (i in 0 ... (an < bn ? an : bn)) {
+			var ac = Std.parseInt(aw[i]); if (ac == null) ac = 0;
+			var bc = Std.parseInt(bw[i]); if (bc == null) bc = 0;
+			if (ac != bc) return ac < bc ? -1 : 1;
+		}
+		return (an != bn) ? (an < bn ? -1 : 1) : 0;
 	}
 }
