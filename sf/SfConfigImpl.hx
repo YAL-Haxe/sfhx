@@ -71,7 +71,7 @@ class SfConfigImpl {
 		return v;
 	}
 	
-	public static function bool(name:String, def:Bool = false):Bool {
+	public static function bool(name:String, ?def:Bool):Bool {
 		var v = value(name);
 		if (v != null) {
 			return v != "0" && v != "false";
