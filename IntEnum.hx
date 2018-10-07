@@ -11,14 +11,41 @@ import haxe.macro.Type;
  */
 @:noCompletion
 class IntEnum {
-	public static macro function build(kindName:String = "int"):Array<Field> {
+	static function toSnakeCase(s:String):String {
+		var n = s.length;
+		// early exit if the string is already in snake_case:
+		var i = -1;
+		while (++i < n) {
+			var c = StringTools.fastCodeAt(s, i); // or s.charCodeAt(i)
+			if (c >= "A".code && c <= "Z".code) break;
+		}
+		if (i >= n) return s;
+		// otherwise form it via a string buffer:
+		var r = new StringBuf();
+		var p = 0;
+		for (i in 0 ... n) {
+			var c = StringTools.fastCodeAt(s, i);
+			if (c >= "A".code && c <= "Z".code) {
+				if (p >= "a".code && p <= "z".code
+				 || p >= "0".code && p <= "9".code) { // "eC" -> "e_c"
+					r.addChar("_".code);
+				}
+				r.addChar(c + ("a".code - "A".code));
+			} else r.addChar(c);
+			p = c;
+		}
+		return r.toString();
+	}
+	public static macro function build(kindName:String = "int", prefix:String = ""):Array<Field> {
 		var pos = Context.currentPos();
 		var autoKind:AutoEnumKind = switch (kindName.toLowerCase()) {
 			case "int": AInt(false);
 			case "bit": AInt(true);
-			case "lq", "lower": AString(false);
-			case "uq", "upper": AString(true);
-			case "nq", "string", "str": AString(null);
+			case "lq", "lower": AString(false, false);
+			case "uq", "upper": AString(true, false);
+			case "l_q", "lsq", "lower_case": AString(false, true);
+			case "u_q", "usq", "upper_case": AString(true, true);
+			case "nq", "string", "str": AString(null, false);
 			default: Context.error('"$kindName" is not a known kind.', pos);
 		}
 		var at:AbstractType = switch (Context.getLocalClass().get().kind) {
@@ -56,10 +83,16 @@ class IntEnum {
 							if (isBit) nextIndex <<= 1; else nextIndex += 1;
 							field.kind = FVar(t, { expr: EConst(CInt(value)), pos: field.pos });
 						};
-						case AString(z): {
+						case AString(zu, zs): {
 							value = field.name;
-							if (z == true) value = value.toUpperCase();
-							if (z == false) value = value.toLowerCase();
+							if (zs) {
+								value = toSnakeCase(value);
+								if (zu) value = value.toUpperCase();
+							} else {
+								if (zu == true) value = value.toUpperCase();
+								if (zu == false) value = value.toLowerCase();
+							}
+							value = prefix + value;
 							field.kind = FVar(t, { expr: EConst(CString(value)), pos: field.pos });
 						};
 					}
@@ -129,5 +162,5 @@ class IntEnum {
 }
 private enum AutoEnumKind {
 	AInt(bit:Bool);
-	AString(upper:Bool);
+	AString(upper:Bool, snake:Bool);
 }
