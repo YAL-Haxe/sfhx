@@ -30,6 +30,9 @@ class SfStructImpl {
 	/** Whether the structure should be omitted from the final output */
 	public var isHidden:Bool = false;
 	
+	/** Whether the structure is auto-generated and shouldn't be exposed where possible */
+	public var isAutogen:Bool = false;
+	
 	public var meta:MetaAccess;
 	
 	/**
