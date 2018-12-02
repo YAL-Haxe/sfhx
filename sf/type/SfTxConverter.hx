@@ -275,7 +275,7 @@ class SfTxConverter {
 			case TUnop(o, p, x): rd = SfUnop(o, p, f(x));
 			case TFunction(o): {
 				var args:Array<SfArgument> = [];
-				for (a in o.args) args.push({ v: SfVar.fromTVar(a.v), value: a.value });
+				for (a in o.args) args.push(SfArgument.fromTyped(a));
 				rd = SfFunction({ args: args, ret: o.t, expr: f(o.expr) });
 			};
 			case TVar(v, x): rd = SfVarDecl(SfVar.fromTVar(v), x != null, f(x));

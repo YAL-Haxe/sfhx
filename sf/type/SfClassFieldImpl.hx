@@ -79,15 +79,12 @@ class SfClassFieldImpl extends SfField {
 				}
 				isCallable = true;
 				type = f_out;
-				var sfArgs = null;
+				var sfArgs:Array<SfArgument> = null;
 				// if typedExpr is available, get argument data from it:
 				if (typedExpr != null) switch (typedExpr.expr) {
 					case TFunction(f): {
 						sfArgs = [];
-						for (f_arg in f.args) sfArgs.push({
-							v: SfVar.fromTVar(f_arg.v), 
-							value: f_arg.value,
-						});
+						for (f_arg in f.args) sfArgs.push(SfArgument.fromTyped(f_arg));
 						type = f.t;
 						typedExpr = f.expr;
 					};
@@ -96,10 +93,10 @@ class SfClassFieldImpl extends SfField {
 				// otherwise get argument data from TFun:
 				if (sfArgs == null) {
 					sfArgs = [];
-					if (f_args != null) for (arg in f_args) sfArgs.push({
-						v: new SfVar(arg.name, arg.t),
-						value: arg.opt ? TNull : null
-					});
+					if (f_args != null) for (arg in f_args) sfArgs.push(new SfArgument(
+						new SfVar(arg.name, arg.t),
+						arg.opt ? TNull : null
+					));
 				}
 				this.args = sfArgs;
 			};

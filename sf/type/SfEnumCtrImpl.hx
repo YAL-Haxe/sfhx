@@ -29,11 +29,11 @@ class SfEnumCtrImpl extends SfField {
 		switch (field.type) {
 			case TFun(f_args, f_type): { // EnumField(...);
 				isCallable = true;
-				var sfArgs = [];
-				for (f_arg in f_args) sfArgs.push({
-					v: new SfVar(f_arg.name, f_arg.t),
-					value: f_arg.opt ? TNull : null
-				});
+				var sfArgs:Array<SfArgument> = [];
+				for (f_arg in f_args) sfArgs.push(new SfArgument(
+					new SfVar(f_arg.name, f_arg.t),
+					f_arg.opt ? TNull : null
+				));
 				args = sfArgs;
 				type = f_type;
 			};
