@@ -51,7 +51,7 @@ class SfExprTools {
 			case SfUnop(o, p, x): SfUnop(o, p, f(x));
 			case SfArrayAccess(o, i): SfArrayAccess(f(o), f(i));
 			case SfInstField(o, i): SfInstField(f(o), i);
-			case SfStaticField(c, f): SfStaticField(c, f);
+			case SfStaticField(c, _fd): SfStaticField(c, _fd);
 			case SfDynamicField(o, s): SfDynamicField(f(o), s);
 			case SfCall(x, w): SfCall(f(x), fx(w));
 			case SfIf(x1, x2, z, x3): SfIf(f(x1), f(x2), z, f(x3));
@@ -323,6 +323,13 @@ class SfExprTools {
 			}
 			case [TInst(_.get() => t1, p1), TInst(_.get() => t2, p2)]: {
 				return fb(t1, t2) && fx(p1, p2);
+			}
+			case [TMono(_.get() => t1), TMono(_.get() => t2)]: {
+				if (t1 != null) {
+					if (t2 != null) {
+						return typeEquals(t1, t2);
+					} else return false;
+				} else return t2 == null;
 			}
 			case [TAbstract(_.get() => t1, p1), TAbstract(_.get() => t2, p2)]: {
 				return fb(t1, t2) && fx(p1, p2);

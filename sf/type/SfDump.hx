@@ -174,8 +174,8 @@ class SfDump {
 				}
 			}
 			case SfArrayAccess(q, e): f(q); printf(r, "["); f(e); printf(r, "]");
-			case SfEnumAccess(q, _, i): f(q); printf(r, "["); f(i); printf(r, "]");
-			case SfEnumParameter(x, q, i): f(x); printf(r, "[%d]", i);
+			case SfEnumAccess(q, _, i): f(q); printf(r, "[EA:"); f(i); printf(r, "]");
+			case SfEnumParameter(x, q, i): f(x); printf(r, "[EP:%d]", i);
 			case SfEnumField(_, c): {
 				r.addFieldPath(c, "_".code, "_".code);
 			};
@@ -275,7 +275,7 @@ class SfDump {
 				type(q.ret, r);
 				printf(r, " "); f(q.expr);
 			};
-			case SfStaticField(c, f): r.addFieldPath(f);
+			case SfStaticField(c, _field): r.addFieldPath(_field);
 			case SfInstField(o, q): f(o); printf(r, ".%s", q.name);
 			case SfDynamicField(o, s): f(o); printf(r, ".%s", s);
 			case SfParenthesis(e): printf(r, "("); fw(e); printf(r, ")");
