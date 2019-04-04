@@ -19,7 +19,9 @@ class SfOptEnum extends SfOptImpl {
 			switch (e.def) {
 				case SfArrayAccess(x, i): {
 					switch (x.getType()) {
-						case TEnum(_et, _): {
+						case TEnum(_et, _)
+							|TAbstract(_, [TEnum(_et, _)]) // subject of dispute
+						: {
 							var et = _et.get();
 							var sfEnum = SfCore.sfGenerator.enumMap.baseGet(et);
 							if (sfEnum == null) x.error("Could not find enum " + et.name);
@@ -45,7 +47,7 @@ class SfOptEnum extends SfOptImpl {
 				default:
 			}
 		});
-		//
+		// `Type.createEnumIndex(FakeEnum, index, null)` -> `index`
 		var _Type:SfClass = cast SfCore.sfGenerator.realMap["Type"];
 		var _Type_createEnumIndex = _Type != null ? _Type.staticMap["createEnumIndex"] : null;
 		if (_Type_createEnumIndex != null) forEachExpr(function(e, w, f) {
