@@ -261,7 +261,8 @@ class SfGeneratorImpl {
 		throw "Not implemented.";
 	}
 	
-	public function printConst(r:SfBuffer, value:TConstant, pos:Position) {
+	public function printConst(r:SfBuffer, value:TConstant, expr:SfExpr) {
+		var pos = SfExprTools.getPos(expr);
 		switch (value) {
 			case TInt(i): r.addInt(i);
 			case TFloat(s): r.addString(s);
