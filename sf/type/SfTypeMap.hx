@@ -30,12 +30,17 @@ abstract SfTypeMap<T>(Map<String, Map<String, T>>) {
 		if (map == null) this[module] = map = new Map();
 		map[name] = value;
 	}
+	//
 	public inline function baseGet(t:BaseType):T {
 		return get(t.module, t.name);
 	}
 	public inline function baseSet(t:BaseType, v:T):Void {
 		set(t.module, t.name, v);
 	}
+	public inline function baseExists(t:BaseType):Bool {
+		return exists(t.module, t.name);
+	}
+	//
 	public inline function sfGet(t:SfType):T {
 		return get(t.module, t.name);
 	}
