@@ -49,6 +49,14 @@ class SfOptCFor extends SfOptImpl {
 							#if (gml)
 							case SfCall(_, _): continue; // illegal now
 							#end
+							case SfVarDecl(v, z, _): {
+								if (!z) continue;
+								if (cond.countLocal(v) == 0) continue;
+							};
+							case SfBinop(OpAssign, _.def => SfLocal(v), _): {
+								if (cond.countLocal(v) == 0) continue;
+							};
+							case SfBinop(_, _, _): continue;
 							default:
 						}
 						// Post-action cannot be a block:
