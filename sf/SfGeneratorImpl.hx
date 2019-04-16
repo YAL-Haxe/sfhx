@@ -113,27 +113,32 @@ class SfGeneratorImpl {
 	
 	private function buildTypes() {
 		var hasSuperClass = [];
+		var sfts:Array<SfType> = [];
 		for (nt in apiTypes) {
-			var sft:SfType = null;
+			inline function addClass(ct:ClassType):Void {
+				if (classMap.baseExists(ct)) return;
+				var sfc = new SfClass(ct);
+				if (ct.superClass != null) hasSuperClass.push(sfc);
+				classList.push(sfc);
+				classMap.sfSet(sfc, sfc);
+				sfts.push(sfc);
+			}
 			switch (nt) {
-				case TInst(_.get() => ct, _): {
-					var sfc = new SfClass(ct);
-					if (ct.superClass != null) hasSuperClass.push(sfc);
-					classList.push(sfc);
-					classMap.sfSet(sfc, sfc);
-					sft = sfc;
-				};
+				case TInst(_.get() => ct, _): addClass(ct);
 				case TEnum(_.get() => et, _): {
 					var sfe = new SfEnum(et);
 					enumList.push(sfe);
 					enumMap.sfSet(sfe, sfe);
-					sft = sfe;
+					sfts.push(sfe);
 				};
 				case TAbstract(_.get() => at, _): {
 					var sfa = new SfAbstract(at);
+					if (at.impl != null) {
+						addClass(at.impl.get());
+					}
 					abstractList.push(sfa);
 					abstractMap.sfSet(sfa, sfa);
-					sft = sfa;
+					sfts.push(sfa);
 				};
 				case TType(_.get() => dt, _): {
 					switch (dt.type) {
@@ -141,14 +146,14 @@ class SfGeneratorImpl {
 							var sfa = new SfAnon(dt, at);
 							anonList.push(sfa);
 							anonMap.sfSet(sfa, sfa);
-							sft = sfa;
+							sfts.push(sfa);
 						};
 						default:
 					}
 				};
 				default:
 			} // switch (t)
-			if (sft != null) {
+			for (sft in sfts) {
 				typeList.push(sft);
 				typeMap.sfSet(sft, sft);
 				realMap.set(sft.realPath, sft);
@@ -156,10 +161,14 @@ class SfGeneratorImpl {
 				b.addTypePath(sft, ".".code);
 				featureMap.set(b.toString(), sft);
 			}
+			sfts.splice(0, sfts.length);
 		} // for (nt in api.types)
 		for (sfa in abstractList) {
 			var impl = sfa.abstractType.impl;
-			if (impl != null) sfa.impl = classMap.baseGet(impl.get());
+			if (impl != null) {
+				sfa.impl = classMap.baseGet(impl.get());
+				if (sfa.impl == null) Context.warning("Couldn't find implementation for " + sfa.name, sfa.abstractType.pos);
+			}
 		}
 		for (sfc in hasSuperClass) {
 			var sup = classMap.baseGet(sfc.classType.superClass.t.get());
