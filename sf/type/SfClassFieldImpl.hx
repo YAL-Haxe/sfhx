@@ -103,6 +103,10 @@ class SfClassFieldImpl extends SfField {
 			default:
 		};
 		isInst = inst;
+		if (!inst && meta.has(":impl")) switch (kind) {
+			case FVar(_, _): isHidden = true;
+			default:
+		}
 	}
 	
 	override public function dumpTo(out:SfBuffer):Void {
