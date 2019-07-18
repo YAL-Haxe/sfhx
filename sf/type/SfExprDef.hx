@@ -26,9 +26,6 @@ enum SfExprDef {
 	/** enumValue[index]. 0 -> name, 1 -> ctrIndex, 2+ -> data */
 	SfEnumAccess(expr:SfExpr, sfEnum:SfEnum, index:SfExpr);
 	
-	/** enumValue.index */
-	//SfEnumIndex(expr:SfExpr, sfEnum:SfEnum);
-	
 	/** enumValue[fieldIndex] */
 	SfEnumParameter(expr:SfExpr, field:SfEnumCtr, index:Int);
 	
@@ -116,10 +113,15 @@ enum SfExprDef {
 	/** cast expr:type */
 	SfCast(expr:SfExpr, type:SfType);
 	
+	/** typeof expr */
+	SfTypeOf(expr:SfExpr);
+	
 	/** (expr instanceof type) */
 	SfInstanceOf(expr:SfExpr, type:SfExpr);
 	
 	/** (@meta(...)expr) */
 	SfMeta(meta:MetadataEntry, expr:SfExpr);
 	
+	/** JS-specific (a === b), is resolved in SfOptInstanceOf */
+	SfStrictEq(a:SfExpr, b:SfExpr);
 }

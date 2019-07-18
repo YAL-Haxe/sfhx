@@ -21,70 +21,54 @@ class SfOptInstanceOf extends SfOptImpl {
 			inline function mod(d:SfExprDef):SfExpr {
 				return expr.mod(d);
 			}
+			inline function setInstOf(x:SfExpr, t:SfType, not:Bool):Void {
+				next = SfInstanceOf(x, mod(SfTypeExpr(t)));
+				if (not) {
+					expr.setTo(SfUnop(OpNot, false, mod(next)));
+				} else expr.setTo(next);
+			}
 			switch (expr.def) {
+				
+				// `typeof(v) == "string"` -> instanceof(v, String)
 				case SfBinop(op = OpEq | OpNotEq,
-					_.def => SfCall(_.def => (
-						SfDynamic("__typeof__", _) |
-						SfStaticField({ realName: "Syntax" }, { realName: "typeof" })
-					), [x]),
+					_.def => SfTypeOf(x),
 					_.def => SfConst(TString("string"))
-				): { // `__typeof__(v) == "string"`
-					next = SfInstanceOf(x, mod(SfTypeExpr(sfGenerator.typeString)));
-					if (op == OpNotEq) {
-						expr.setTo(SfUnop(OpNot, false, mod(next)));
-					} else expr.setTo(next);
-				};
+				): setInstOf(x, sfGenerator.typeString, op == OpNotEq);
+				
+				// `typeof(v) == "number"` -> instanceof(v, Float)
 				case SfBinop(op = OpEq | OpNotEq,
-					_.def => SfCall(_.def => (
-						SfDynamic("__typeof__", _) |
-						SfStaticField({ realName: "Syntax" }, { realName: "typeof" })
-					), [x]),
+					_.def => SfTypeOf(x),
 					_.def => SfConst(TString("number"))
-				): { // `__typeof__(v) == "number"`
-					next = SfInstanceOf(x, mod(SfTypeExpr(sfGenerator.typeFloat)));
-					if (op == OpNotEq) {
-						expr.setTo(SfUnop(OpNot, false, mod(next)));
-					} else expr.setTo(next);
-				};
+				): setInstOf(x, sfGenerator.typeFloat, op == OpNotEq);
+				
+				// `typeof(v) == "boolean"` -> instanceof(v, Bool)
 				case SfBinop(op = OpEq | OpNotEq,
-					_.def => SfCall(_.def => (
-						SfDynamic("__typeof__", _) |
-						SfStaticField({ realName: "Syntax" }, { realName: "typeof" })
-					), [x]),
+					_.def => SfTypeOf(x),
 					_.def => SfConst(TString("boolean"))
-				): { // `__typeof__(v) == "boolean"`
-					next = SfInstanceOf(x, mod(SfTypeExpr(sfGenerator.typeBool)));
-					if (op == OpNotEq) {
-						expr.setTo(SfUnop(OpNot, false, mod(next)));
-					} else expr.setTo(next);
-				};
-				case SfCall(_.def => SfDynamic("__strict_eq__", _), [
-					_.def => SfParenthesis(_.def => SfBinop(OpOr,
-						e, _.def => SfConst(TInt(0))
-					)),
-					e1
-				]) if (e.equals(e1)): { // `__strict_eq__((e|0), e)`
-					expr.setTo(SfInstanceOf(e, mod(SfTypeExpr(sfGenerator.typeInt))));
-				};
+				): setInstOf(x, sfGenerator.typeBool, op == OpNotEq);
+				
+				// `typeof(v) == "number" && ((v | 0) === v)` -> instanceof(v, Int)
 				case SfBinop(OpBoolAnd,
-					_.def => SfCall(_.def => SfDynamic("__instanceof__", _), [
-						e, et = _.def => SfTypeExpr(t)
-					]),
-					_.def => SfBinop(OpEq,
-						_.def => SfDynamicField(e1, "__enum__"),
-						_.def => SfConst(TNull)
+					_.def => SfInstanceOf(x1, _.def => SfTypeExpr(t1)),
+					_.def => SfStrictEq(
+						_.def => SfBinop(OpOr, x2, _.def => SfConst(TInt(0))),
+						x3
 					)
-				), SfBinop(OpBoolAnd,
-					_.def => SfInstanceOf(e, et = _.def => SfTypeExpr(t)),
+				) if (
+					t1 == sfGenerator.typeFloat && x1.equals(x2) && x1.equals(x3)
+				): setInstOf(x1, sfGenerator.typeInt, false);
+				
+				// `instanceof(v, Array) && v.__enum__ == null` -> instanceof(v, Array) [redundancy]
+				case SfBinop(OpBoolAnd,
+					_.def => x = SfInstanceOf(e, et = _.def => SfTypeExpr(t)),
 					_.def => SfBinop(OpEq,
 						_.def => SfDynamicField(e1, "__enum__"),
 						_.def => SfConst(TNull)
 					)
 				) if (
 					t == sfGenerator.typeArray && e.equals(e1)
-				): { // `__instanceof__(e, Type) && e.__enum__ != null`
-					expr.setTo(SfInstanceOf(e, et));
-				};
+				): expr.def = x;
+				
 				default:
 			}
 		});

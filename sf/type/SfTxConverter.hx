@@ -183,6 +183,8 @@ class SfTxConverter {
 							if (m.length < 1) error(e, "Expected two arguments.");
 							r = f(m[1]);
 						};
+						case "__typeof__": rd = SfTypeOf(f(m[0]));
+						case "__instanceof__": rd = SfInstanceOf(f(m[0]), f(m[1]));
 						case "__feature__": {
 							switch (m[0].expr) {
 								case TConst(TString(s)): {
@@ -208,18 +210,7 @@ class SfTxConverter {
 						_.get() => { module: "js.Syntax" }, _.get() => fd
 					)): {
 						switch (fd.name) {
-							case "instanceof": {
-								#if (sfjs)
-								rd = SfDynamic("({0} instanceof {1})", [f(m[0]), f(m[1])]);
-								#else
-								rd = SfInstanceOf(f(m[0]), f(m[1]));
-								#end
-							};
-							case "typeof": {
-								#if (sfjs)
-								rd = SfDynamic("(typeof {0})", [f(m[0])]);
-								#end
-							};
+							#if (sfjs)
 							case "construct": {
 								var c = f(m[0]);
 								var args = [];
@@ -230,9 +221,10 @@ class SfTxConverter {
 									new SfExpr(c.data, SfDynamic("new {0}", [c])),
 									args);
 							};
-							case "strictEq": {
-								rd = SfDynamic("({0} === {1})", [f(m[0]), f(m[1])]);
-							};
+							#end
+							case "instanceof": rd = SfInstanceOf(f(m[0]), f(m[1]));
+							case "typeof": rd = SfTypeOf(f(m[0]));
+							case "strictEq": rd = SfStrictEq(f(m[0]), f(m[1]));
 							case "code": {
 								var args = fx(m);
 								switch (args.shift().def) {
@@ -242,7 +234,7 @@ class SfTxConverter {
 									default: error(m[0], "Expected a string");
 								}
 							};
-							default: error(m[0], "SfTxConverter: Can't handle " + fd.name);
+							default: error(m[0], "SfTxConverter: Can't handle js.Syntax." + fd.name);
 						}
 					};
 					default:
@@ -345,6 +337,7 @@ class SfTxConverter {
 			case TEnumParameter(x, ef, i): {
 				var et:EnumType;
 				switch (x.t) {
+					case TType(_.get() => {type: TEnum(_et, _)}, _): et = _et.get();
 					case TEnum(_et, _): et = _et.get();
 					default: error(e, "Taking enum parameter of non-enum type?");
 				}

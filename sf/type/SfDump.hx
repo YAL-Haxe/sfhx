@@ -116,14 +116,18 @@ class SfDump {
 				printf(r, "(");
 				for (k in 0 ... params.length) {
 					if (k > 0) printf(r, ", ");
-					switch (params[k].expr) {
+					var param = params[k];
+					switch (param.expr) {
 						case EConst(c): switch (c) {
 							case CInt(s)|CFloat(s)|CIdent(s): printf(r, "%s", s);
 							case CString(s): printf(r, '"%s"', s);
 							case CRegexp(s, o): printf(r, "~/%s/%s", s, o);
 							default: printf(r, "%s", c.getName());
 						};
-						default: printf(r, "%s", params[k].expr.getName());
+						default: {
+							printf(r, "%s", haxe.macro.ExprTools.toString(param));
+							//printf(r, "%s", params[k].expr.getName());
+						}
 					}
 				}
 				printf(r, ")");
@@ -275,7 +279,16 @@ class SfDump {
 				type(q.ret, r);
 				printf(r, " "); f(q.expr);
 			};
-			case SfStaticField(c, _field): r.addFieldPath(_field);
+			case SfStaticField(c, _field): {
+				if (_field != null) {
+					r.addFieldPath(_field);
+				} else {
+					if (c != null) {
+						r.addTypePathAuto(c);
+					} else printf(r, "?");
+					printf(r, ".?");
+				}
+			};
 			case SfInstField(o, q): f(o); printf(r, ".%s", q.name);
 			case SfDynamicField(o, s): f(o); printf(r, ".%s", s);
 			case SfParenthesis(e): printf(r, "("); fw(e); printf(r, ")");
@@ -377,6 +390,12 @@ class SfDump {
 			case SfBreak: printf(r, "break");
 			case SfContinue: printf(r, "continue");
 			case SfCast(e, t): printf(r, "cast("); f(e); printf(r, ", %s)", t.name);
+			case SfTypeOf(e): printf(r, "typeof("); f(e); printf(r, ")");
+			case SfStrictEq(a, b): {
+				if (q == EC_INLINE) r.addParOpen();
+				f(a); printf(r, " === "); f(b);
+				if (q == EC_INLINE) r.addParClose();
+			}
 			case SfMeta(m, e): {
 				printf(r, "@%s", m.name);
 				var _params = m.params;

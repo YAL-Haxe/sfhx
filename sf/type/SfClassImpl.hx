@@ -35,6 +35,7 @@ class SfClassImpl extends SfType {
 	/** */
 	public var instMap:Map<String, SfClassField> = new Map();
 	
+	/** original name -> class field */
 	public var realMap:Map<String, SfClassField> = new Map();
 	
 	/** Constructor field (if any) */

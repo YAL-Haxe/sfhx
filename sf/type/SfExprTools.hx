@@ -84,6 +84,7 @@ class SfExprTools {
 			case SfEnumAccess(a, _, i): f2(a, i);
 			case SfEnumParameter(e, _, _): f1(e);
 			case SfBinop(_, a, b): f2(a, b);
+			case SfStrictEq(a, b): f2(a, b);
 			case SfInstField(o, _): f1(o);
 			case SfClosureField(o, _): f1(o);
 			case SfStaticField(_, _): f0();
@@ -111,6 +112,7 @@ class SfExprTools {
 			case SfContinue: f0();
 			case SfThrow(e): f1(e);
 			case SfCast(e, _): f1(e);
+			case SfTypeOf(e): f1(e);
 			case SfInstanceOf(e, t): f2(e, t);
 			case SfMeta(_, e): f1(e);
 		}
@@ -143,6 +145,7 @@ class SfExprTools {
 			case SfEnumAccess(a, _, i): f2(a, i);
 			case SfEnumParameter(e, _, _): f1(e);
 			case SfBinop(_, a, b): f2(a, b);
+			case SfStrictEq(a, b): f2(a, b);
 			case SfInstField(o, _): f1(o);
 			case SfClosureField(o, _): f1(o);
 			case SfStaticField(_, _): f0();
@@ -199,6 +202,7 @@ class SfExprTools {
 			case SfContinue: f0();
 			case SfThrow(e): f1(e);
 			case SfCast(e, _): f1(e);
+			case SfTypeOf(e): f1(e);
 			case SfInstanceOf(e, t): f2(e, t);
 			case SfMeta(_, e): f1(e);
 		}
@@ -671,14 +675,23 @@ class SfExprTools {
 		inline function max(a:Int, b:Int) return (a < b ? b : a);
 		return switch (expr.def) {
 			case SfLocal(v): v.name == local.name ? 1 : 0;
+			
 			case SfConst(_) | SfStaticField(_, _) | SfBreak | SfContinue
-			| SfTypeExpr(_) | SfEnumField(_, _): 0;
-			case SfArrayAccess(a, b) | SfEnumAccess(a, _, b) | SfBinop(_, a, b) | SfForEach(_, a, b) | SfWhile(a, b, _) | SfInstanceOf(a, b) : f(a) + f(b);
+			| SfTypeExpr(_) | SfEnumField(_, _)
+			: 0;
+			
+			case SfArrayAccess(a, b) | SfEnumAccess(a, _, b) | SfBinop(_, a, b)
+				| SfForEach(_, a, b) | SfWhile(a, b, _) | SfInstanceOf(a, b) | SfStrictEq(a, b)
+			: f(a) + f(b);
+			
 			case SfThrow(x) | SfParenthesis(x) | SfEnumParameter(x, _, _)
-			| SfInstField(x, _) | SfDynamicField(x, _) | SfClosureField(x, _)
-			| SfMeta(_, x) | SfCast(x, _) | SfUnop(_, _, x): f(x);
-			case SfArrayDecl(w) | SfNew(_, _, w) | SfBlock(w) | SfTrace(_, w)
-			| SfDynamic(_, w): r = 0; fx(w); r;
+				| SfInstField(x, _) | SfDynamicField(x, _) | SfClosureField(x, _)
+				| SfMeta(_, x) | SfCast(x, _) | SfUnop(_, _, x) | SfTypeOf(x)
+			: f(x);
+			
+			case SfArrayDecl(w) | SfNew(_, _, w) | SfBlock(w) | SfTrace(_, w) | SfDynamic(_, w)
+			: r = 0; fx(w); r;
+			
 			case SfObjectDecl(w): r = 0; for (o in w) r += f(o.expr); r;
 			case SfCall(x, w): r = f(x); fx(w); r;
 			case SfVarDecl(_, z, x) | SfReturn(z, x): z ? f(x) : 0;
