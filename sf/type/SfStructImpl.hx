@@ -18,14 +18,14 @@ class SfStructImpl {
 	/** Package (com.company.name) */
 	public var pack:Array<String>;
 	
-	/** Documentation (if any) */
-	public var doc:String;
+	/** Documentation string (if any) */
+	public var doc:String = "";
 	
 	/** Output path in target-specific format (if needed) */
 	public var path:String;
 	
-	/** Path override */
-	public var exposePath:String;
+	/** Path override (for SfBuffer.addFieldPath) */
+	public var exposePath:String = null;
 	
 	/** Whether the structure should be omitted from the final output */
 	public var isHidden:Bool = false;
@@ -67,7 +67,7 @@ class SfStructImpl {
 	}
 	private var metaString_1 = new Map<String, String>();
 	
-	public function metaHandle(meta:MetaAccess, ndoc:String) {
+	public function metaHandle(meta:MetaAccess, nativeDoc:String) {
 		//
 		if (meta.has(":realPath")) {
 			realName = metaGetText(meta, ":realPath");
@@ -79,14 +79,7 @@ class SfStructImpl {
 			isHidden = true;
 		}
 		//
-		var exp = metaString(":expose");
-		if (exp != null && exp != "") exposePath = exp;
-		var doc = metaGetText(meta, ":doc", 1);
-		if (doc == null && exp != null) doc = "";
-		if (doc == "" && ndoc != null) doc = ndoc;
-		if (doc != null) doc = StringTools.trim(doc);
-		this.doc = doc;
-		//
+		if (nativeDoc != null) doc = nativeDoc;
 	}
 	
 	/**
