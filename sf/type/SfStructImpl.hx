@@ -79,6 +79,9 @@ class SfStructImpl {
 			isHidden = true;
 		}
 		//
+		var exp = metaString(":expose");
+		if (exp != null && exp != "") exposePath = exp;
+		//
 		if (nativeDoc != null) doc = nativeDoc;
 	}
 	
