@@ -170,7 +170,7 @@ class SfGeneratorImpl {
 				if (sfa.impl == null) {
 					Context.warning("Couldn't find implementation for " + sfa.name, sfa.abstractType.pos);
 				} else {
-					if (sfa.meta.has(":std")) {
+					if (!sfa.impl.isExtern && sfa.meta.has(":std")) {
 						var pkg = SfCore.sfConfig.stdPack;
 						if (pkg != null) sfa.impl.pack.unshift(pkg);
 					}
