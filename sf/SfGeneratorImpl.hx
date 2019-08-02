@@ -161,8 +161,10 @@ class SfGeneratorImpl {
 				b.addTypePath(sft, ".".code);
 				featureMap.set(b.toString(), sft);
 			}
-			sfts.splice(0, sfts.length);
+			sfts.resize(0);
 		} // for (nt in api.types)
+		
+		// resolve abstract implementations:
 		for (sfa in abstractList) {
 			var impl = sfa.abstractType.impl;
 			if (impl != null) {
@@ -170,6 +172,7 @@ class SfGeneratorImpl {
 				if (sfa.impl == null) {
 					Context.warning("Couldn't find implementation for " + sfa.name, sfa.abstractType.pos);
 				} else {
+					// abstract metas are split oddly between abstract/impl
 					if (!sfa.impl.isExtern && sfa.meta.has(":std")) {
 						var pkg = SfCore.sfConfig.stdPack;
 						if (pkg != null) sfa.impl.pack.unshift(pkg);
@@ -177,6 +180,8 @@ class SfGeneratorImpl {
 				}
 			}
 		}
+		
+		// resolve parent classes:
 		for (sfc in hasSuperClass) {
 			var sup = classMap.baseGet(sfc.classType.superClass.t.get());
 			if (sup != null) {
@@ -184,23 +189,30 @@ class SfGeneratorImpl {
 				sup.children.push(sfc);
 			}
 		}
-		// mark child functions as dynamic if their parent is dynamic
-		for (sfc in hasSuperClass) if (!sfc.isExtern) {
-			var sfcSup = sfc.superClass;
-			for (fd in sfc.instList) if (!fd.isDynFunc) {
-				var fdName = fd.name;
-				var c = sfcSup;
-				while (c != null) {
-					var sfd = c.fieldMap[fdName];
-					if (sfd != null && sfd.isDynFunc) break;
-					c = c.superClass;
+		
+		// methods with overrides have to be dynFunc or we'll get the C++ effect
+		for (childClass in hasSuperClass) if (!childClass.isExtern) {
+			var parentClass = childClass.superClass;
+			for (childField in childClass.instList) {
+				var fdName = childField.name;
+				var isOverride = false;
+				var iterClass = parentClass;
+				while (iterClass != null) {
+					var iterField = iterClass.instMap[fdName];
+					if (iterField != null) {
+						iterField.isDynFunc = true;
+						iterField.isVar = true;
+						isOverride = true;
+					}
+					iterClass = iterClass.superClass;
 				}
-				if (c != null) {
-					fd.isDynFunc = true;
-					fd.isVar = true;
+				if (isOverride) {
+					childField.isDynFunc = true;
+					childField.isVar = true;
 				}
 			}
 		}
+		
 		typeInit();
 	}
 	
