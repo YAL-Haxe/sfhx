@@ -48,6 +48,8 @@ class SfCore {
 					#if !eval_stack
 					Sys.println("(no eval-stack)");
 					#end
+					var pos = haxe.macro.PositionTools.make({min:0, max:0, file:api.outputFile});
+					Context.error("Generator error (see full output): " + e, pos);
 				}
 			});
 		} else {
