@@ -338,6 +338,13 @@ class SfExprTools {
 			case [TAbstract(_.get() => t1, p1), TAbstract(_.get() => t2, p2)]: {
 				return fb(t1, t2) && fx(p1, p2);
 			}
+			case [TDynamic(a), TDynamic(b)]: {
+				switch ([a != null, b != null]) {
+					case [true, true]: return typeEquals(a, b, pos);
+					case [false, false]: return true;
+					default: return false;
+				}
+			};
 			default: {
 				var s = "SfExprTools.typeEquals: Can't compare " + t1.getName() + ".";
 				#if (macro)
