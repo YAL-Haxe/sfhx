@@ -442,6 +442,13 @@ class SfExprTools {
 		}
 	}
 	
+	public static function followType(expr:SfExpr, withAbstracts:Bool = true):Type {
+		var t = getType(expr);
+		if (withAbstracts) {
+			return haxe.macro.TypeTools.followWithAbstracts(t);
+		} else return haxe.macro.TypeTools.follow(t);
+	}
+	
 	public static inline function setType(expr:SfExpr, t:Type):Void {
 		expr.data.t = t;
 	}
