@@ -41,12 +41,13 @@ class SfCore {
 				try {
 					sfg.compile(api.types, api.main, api.outputFile);
 				} catch (e:Dynamic) {
-					Sys.println("Stack: " + haxe.CallStack.toString(haxe.CallStack.exceptionStack()));
+					var stack = haxe.CallStack.exceptionStack();
+					Sys.println("Stack: " + haxe.CallStack.toString(stack));
 					Sys.println("Tag: " + Std.string(xt));
 					Sys.println("Tag2: " + Std.string(xt2));
 					Sys.println("Error: " + Std.string(e));
 					#if !eval_stack
-					Sys.println("(no eval-stack)");
+					if (stack.length == 0) Sys.println("(no eval-stack)");
 					#end
 					var pos = haxe.macro.PositionTools.make({min:0, max:0, file:api.outputFile});
 					Context.error("Generator error (see full output): " + e, pos);
