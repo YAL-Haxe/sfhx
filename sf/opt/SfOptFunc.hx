@@ -1,8 +1,8 @@
 package sf.opt;
 
 import sf.opt.SfOptImpl;
-import sf.type.SfExprDef.*;
-using sf.type.SfExprTools;
+import sf.type.expr.SfExprDef.*;
+using sf.type.expr.SfExprTools;
 
 /**
  * var func = function(...) { ... } -> function func(...) { ... }

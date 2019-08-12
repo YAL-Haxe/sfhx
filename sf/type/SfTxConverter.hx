@@ -1,8 +1,8 @@
 package sf.type;
 import haxe.macro.Type;
 import haxe.macro.Type.TypedExprDef.*;
-import sf.type.SfExprDef.*;
-import sf.type.SfExpr;
+import sf.type.expr.SfExprDef.*;
+import sf.type.expr.*;
 import sf.SfCore.*;
 
 /**

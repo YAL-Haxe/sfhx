@@ -1,9 +1,9 @@
-package sf.type;
+package sf.type.expr;
 import haxe.macro.Expr;
 import haxe.macro.Expr.Binop;
 import haxe.macro.Expr.Unop;
 import haxe.macro.Type;
-import sf.type.SfExpr;
+import sf.type.expr.SfExpr;
 
 /**
  * ...

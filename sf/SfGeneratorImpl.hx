@@ -3,6 +3,8 @@ package sf;
 import haxe.macro.Context;
 import haxe.macro.Expr.Position;
 import sf.type.*;
+import sf.type.expr.*;
+import sf.type.expr.*;
 import sf.type.SfTypeImpl;
 import sf.opt.*;
 import haxe.macro.JSGenApi;

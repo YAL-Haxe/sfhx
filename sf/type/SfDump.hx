@@ -6,11 +6,11 @@ import haxe.macro.Expr.Position;
 import haxe.macro.Type;
 import haxe.macro.Type.TypedExprDef.*;
 import haxe.macro.Expr.Binop.*;
-import sf.type.SfExpr.SfExprData;
-import sf.type.SfExprDef.*;
+import sf.type.expr.SfExprDef.*;
 import sf.SfCore.*;
 import SfTools.*;
-using sf.type.SfExprTools;
+import sf.type.expr.*;
+using sf.type.expr.SfExprTools;
 
 /**
  * ...

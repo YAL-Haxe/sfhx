@@ -2,6 +2,7 @@ package sf.type;
 import haxe.macro.Expr;
 import haxe.macro.Type;
 import sf.SfCore.*;
+import sf.type.expr.*;
 
 #if (display)
 private class SfBufferBase {

@@ -1,11 +1,12 @@
 package sf.opt;
 
 import sf.opt.SfOptImpl;
-import sf.type.SfExprDef.*;
+import sf.type.expr.SfExprDef.*;
 import sf.type.*;
+import sf.type.expr.*;
 import haxe.macro.Expr.Binop.*;
 import haxe.macro.Type.TConstant.*;
-using sf.type.SfExprTools;
+using sf.type.expr.SfExprTools;
 
 /**
  * Concats string constants.

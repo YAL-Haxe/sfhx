@@ -1,10 +1,11 @@
 package sf.opt;
 
 import sf.opt.SfOptImpl;
-import sf.type.SfExprDef.*;
+import sf.type.expr.SfExprDef.*;
 import sf.type.*;
+import sf.type.expr.*;
 import haxe.macro.Type;
-using sf.type.SfExprTools;
+using sf.type.expr.SfExprTools;
 
 /**
  * Enum-related transformations.

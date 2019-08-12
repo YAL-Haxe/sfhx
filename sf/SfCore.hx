@@ -71,7 +71,7 @@ class SfCore {
 						if (i >= 0) s = s.substring(0, i);
 						r = Context.getType(s);
 					} catch (_:Dynamic) {
-						if (sf.type.SfExprTools.typeHasMeta(t, ":used")) {
+						if (sf.type.expr.SfExprTools.typeHasMeta(t, ":used")) {
 							r = t;
 						} else r = null;
 					}

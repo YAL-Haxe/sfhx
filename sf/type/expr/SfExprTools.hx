@@ -1,4 +1,4 @@
-package sf.type;
+package sf.type.expr;
 import haxe.EnumTools;
 #if (macro)
 import haxe.macro.Context;
@@ -6,14 +6,14 @@ import haxe.macro.Context;
 import haxe.macro.Expr.Position;
 import haxe.macro.Type;
 import haxe.macro.Type.TypedExprDef.*;
-import sf.type.SfExpr.SfExprData;
-import sf.type.SfExpr;
+import sf.type.expr.SfExprData;
+import sf.type.expr.SfExpr;
 import haxe.macro.Expr.Binop;
 import haxe.macro.Expr.Unop;
-import sf.type.SfExprDef.*;
+import sf.type.expr.SfExprDef.*;
 import sf.SfCore.*;
 import SfTools.*;
-using sf.type.SfExprTools;
+using sf.type.expr.SfExprTools;
 
 /**
  * Provides a number of functions to aid with pattern matching, checking, and iterating.
@@ -53,6 +53,7 @@ class SfExprTools {
 			case SfInstField(o, i): SfInstField(f(o), i);
 			case SfStaticField(c, _fd): SfStaticField(c, _fd);
 			case SfDynamicField(o, s): SfDynamicField(f(o), s);
+			case SfEnumField(o, fd): SfEnumField(o, fd);
 			case SfCall(x, w): SfCall(f(x), fx(w));
 			case SfIf(x1, x2, z, x3): SfIf(f(x1), f(x2), z, f(x3));
 			case SfParenthesis(x): SfParenthesis(f(x));

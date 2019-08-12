@@ -1,9 +1,10 @@
 package sf.opt;
 
 import sf.opt.SfOptImpl;
-import sf.type.SfExprDef.*;
+import sf.type.expr.SfExprDef.*;
 import sf.type.*;
-using sf.type.SfExprTools;
+import sf.type.expr.*;
+using sf.type.expr.SfExprTools;
 
 /**
  * Eliminates single-use local variables in switches.

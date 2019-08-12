@@ -3,6 +3,7 @@ package sf.type;
 import haxe.macro.Type;
 import haxe.macro.Type.ClassType;
 import sf.type.SfBuffer;
+import sf.type.expr.SfExpr;
 import sf.SfCore.printf;
 
 /**

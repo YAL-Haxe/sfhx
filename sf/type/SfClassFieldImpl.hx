@@ -2,7 +2,8 @@ package sf.type;
 import haxe.macro.Type;
 import sf.type.SfBuffer;
 import sf.SfCore.printf;
-import sf.type.SfExprDef.*;
+import sf.type.expr.SfExprDef.*;
+import sf.type.expr.SfExpr;
 
 /**
  * ...
