@@ -639,7 +639,7 @@ class SfExprTools {
 		var found:Int = 0;
 		function seek(e:SfExpr, w, func:SfExprIter):Void {
 			switch (e.def) {
-				case SfConst(TThis): found += 1;
+				case SfConst(TThis | TSuper): found += 1;
 				default: iter(e, w, func);
 			}
 		}; seek(expr, null, seek);
