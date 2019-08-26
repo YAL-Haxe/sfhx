@@ -227,6 +227,7 @@ class SfGeneratorImpl {
 		if (!conf.forEach) r.push(new SfOptForEach());
 		if (conf.cfor) r.push(new SfOptCFor());
 		if (conf.instanceof) r.push(new SfOptInstanceOf());
+		if (!conf.useBootError) r.push(new SfOptBootError());
 		return r;
 	}
 	

@@ -46,6 +46,8 @@ class SfConfigImpl {
 	/** Whether to generate SfInstanceOf (as opposed to JS-specific checks) */
 	public var instanceof:Bool = false;
 	
+	public var useBootError:Bool = false;
+	
 	/** Optional container package for non-extern `@:std` classes*/
 	public var stdPack:String = string("sf-std-package");
 	
