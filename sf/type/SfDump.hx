@@ -391,6 +391,17 @@ class SfDump {
 			case SfContinue: printf(r, "continue");
 			case SfCast(e, t): printf(r, "cast("); f(e); printf(r, ", %s)", t.name);
 			case SfTypeOf(e): printf(r, "typeof("); f(e); printf(r, ")");
+			case SfTry(x, cc): {
+				printf(r, "try ");
+				f(x);
+				for (c in cc) {
+					printf(r, " catch (%s) ", c.v.name);
+					f(c.expr);
+				}
+			};
+			case SfThrow(x): {
+				printf(r, "throw "); f(x);
+			};
 			case SfStrictEq(a, b): {
 				if (q == EC_INLINE) r.addParOpen();
 				f(a); printf(r, " === "); f(b);
