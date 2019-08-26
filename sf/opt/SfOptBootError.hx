@@ -8,7 +8,8 @@ import sf.type.expr.*;
 using sf.type.expr.SfExprTools;
 
 /**
- * ...
+ * You don't necessarily want to construct a HaxeError every time an exception is thrown.
+ * This gets rid of that if configured.
  * @author YellowAfterlife
  */
 class SfOptBootError extends SfOptImpl {
@@ -17,9 +18,11 @@ class SfOptBootError extends SfOptImpl {
 		if (_Error == null) return;
 		forEachExpr(function(expr:SfExpr, stack:SfExprList, iter:SfExprIter) {
 			switch (expr.def) {
+				// `new haxe._Boot.Error(x)` -> `x`
 				case SfNew(c, _, [x]) if (c == _Error): {
 					expr.def = x.def;
 				};
+				// `((v instanceof haxe._Boot.Error) ? v.val : v)` -> `v`
 				case SfIf(
 					_.def => SfParenthesis(_.def => SfInstanceOf(
 						_.def => SfLocal(v1), _.def => SfTypeExpr(t)
@@ -33,6 +36,5 @@ class SfOptBootError extends SfOptImpl {
 			}
 			expr.iter(stack, iter);
 		});
-		trace(_Error);
 	}
 }
