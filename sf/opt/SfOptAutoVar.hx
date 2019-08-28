@@ -60,6 +60,12 @@ class SfOptAutoVar extends SfOptImpl {
 						// must contain exactly one read:
 						var vc = next.countLocalExt(v);
 						if (vc.writes != 0) continue;
+						if (vc.reads == 0) {
+							if (e.countLocalExt(v).total == 0 && vx.isSimple()) { // not used at all?
+								m.splice(k, 1);
+							}
+							continue;
+						}
 						if (vc.reads != 1) continue;
 						// must be the only occurrence in the block too:
 						if (e.countLocalExt(v).total != 1) continue;
