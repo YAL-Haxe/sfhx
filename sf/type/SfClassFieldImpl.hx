@@ -85,7 +85,7 @@ class SfClassFieldImpl extends SfField {
 				if (typedExpr != null) switch (typedExpr.expr) {
 					case TFunction(f): {
 						sfArgs = [];
-						for (f_arg in f.args) sfArgs.push(SfArgument.fromTyped(f_arg));
+						for (f_arg in f.args) sfArgs.push(SfArgumentImpl.fromTyped(f_arg));
 						type = f.t;
 						typedExpr = f.expr;
 					};
