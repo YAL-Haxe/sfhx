@@ -77,6 +77,9 @@ class SfOptSwitchSimple extends SfOptImpl {
 					case SfIf(cond, then, _, _): {
 						unpacked.def = then.def;
 					};
+					case SfBlock([a = _.def => SfIf(cond, then, _, _), _.def => SfReturn(_, _)]): {
+						a.def = then.def;
+					}
 					default: {
 						Context.error(":sf.unwrapper functions can only have a one-case switch, got "
 							+ unpacked.def.getName(), pos);
