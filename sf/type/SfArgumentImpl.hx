@@ -4,7 +4,7 @@ import haxe.macro.Type;
 /**
  * @author YellowAfterlife
  */
-class SfArgument {
+class SfArgumentImpl {
 	public var v:SfVar;
 	public var value:TConstant;
 	public function new(v:SfVar, ?value:TConstant) {
