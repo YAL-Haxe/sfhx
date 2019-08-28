@@ -24,12 +24,31 @@ class SfOptImpl {
 	public var currentClass:SfClass;
 	public var currentField:SfClassField;
 	
+	public function forEachClassField(func:SfClassField->Void) {
+		var g = sfGenerator;
+		for (_class in g.classList) {
+			currentClass = _class;
+			currentField = null;
+			for (_field in _class.fieldList) {
+				xt2 = _field;
+				currentField = _field;
+				func(_field);
+			}
+			if (_class.constructor != null) {
+				xt2 = _class.constructor;
+				currentField = _class.constructor;
+				func(_class.constructor);
+			}
+		}
+		currentClass = null;
+		currentField = null;
+	}
+	
 	/** Applies an iterator to every top-level expression in the project. */
 	public function forEachExpr(func:SfExprIter, ?stack:Array<SfExpr>) {
-		var e:SfExpr;
 		var g = sfGenerator;
-		/*inline*/ function f(e1:SfExpr):Void {
-			e = e1;
+		function f(e1:SfExpr):Void {
+			var e = e1;
 			if (e != null) {
 				func(e, stack, func);
 			}
