@@ -34,6 +34,7 @@ class SfCore {
 	/** Macros entrypoint */
 	private static function main() {
 		#if !sf_no_gen
+		SfTimes.init();
 		SfGenerator.main();
 		if (Context.defined("js")) {
 			var sfg = new SfGenerator();
@@ -52,6 +53,7 @@ class SfCore {
 					var pos = haxe.macro.PositionTools.make({min:0, max:0, file:api.outputFile});
 					Context.error("Generator error (see full output): " + e, pos);
 				}
+				SfTimes.finish();
 			});
 		} else {
 			var outPath = haxe.macro.Compiler.getOutput();

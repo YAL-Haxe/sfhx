@@ -248,18 +248,25 @@ class SfGeneratorImpl {
 	
 	private function buildFields() {
 		SfCore.xt = "buildFields";
+		var timeClass = false;
+		var timeField = timeClass && false;
 		for (sfClass in classList) if (sfClass.typedInit != null) {
+			if (timeField) SfTimes.mark("+ " + sfClass.module + ":" + sfClass.realName + " __init__");
 			sfClass.init = SfExprTools.fromTypedExpr(sfClass.typedInit);
 		}
 		for (sfClass in classList) {
+			if (timeClass) SfTimes.mark("+ " + sfClass.module + ":" + sfClass.realName);
 			for (sfField in sfClass.staticList) if (sfField.typedExpr != null) {
+				if (timeField) SfTimes.mark("++ " + sfField.name);
 				sfField.expr = SfExprTools.fromTypedExpr(sfField.typedExpr);
 			}
 			var sfConstructor = sfClass.constructor;
 			if (sfConstructor != null) if (sfConstructor.typedExpr != null) {
+				if (timeField) SfTimes.mark("++ new");
 				sfConstructor.expr = SfExprTools.fromTypedExpr(sfConstructor.typedExpr);
 			}
 			for (sfField in sfClass.instList) if (sfField.typedExpr != null) {
+				if (timeField) SfTimes.mark("++ " + sfField.name);
 				sfField.expr = SfExprTools.fromTypedExpr(sfField.typedExpr);
 			}
 		}
@@ -276,12 +283,17 @@ class SfGeneratorImpl {
 			}
 		}
 		//
-		if (SfCore.sfConfig.dump == "pre") File.saveContent("sf.sfdump", SfDump.get());
+		if (SfCore.sfConfig.dump == "pre") {
+			SfTimes.mark("dump");
+			File.saveContent("sf.sfdump", SfDump.get());
+		}
 		// small transformations:
 		for (o in getPreproc()) {
+			SfTimes.mark(StdType.getClassName(StdType.getClass(o)));
 			o.apply();
 		}
 		for (o in getOptimizers()) {
+			SfTimes.mark(StdType.getClassName(StdType.getClass(o)));
 			o.apply();
 		}
 		SfCore.xt = null;
@@ -350,9 +362,15 @@ class SfGeneratorImpl {
 		this.apiTypes = apiTypes;
 		this.apiMain = apiMain;
 		this.outputPath = outputPath;
+		SfTimes.mark("buildTypes");
 		buildTypes();
+		SfTimes.mark("buildFields");
 		buildFields();
-		if (SfCore.sfConfig.dump == "post") File.saveContent("sf.sfdump", SfDump.get());
+		if (SfCore.sfConfig.dump == "post") {
+			SfTimes.mark("dump");
+			File.saveContent("sf.sfdump", SfDump.get());
+		}
+		SfTimes.mark("print");
 		printTo(outputPath);
 		var path2 = SfCore.sfConfig.also;
 		if (path2 != null) printTo(path2);
