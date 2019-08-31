@@ -184,6 +184,7 @@ class SfDump {
 				r.addFieldPath(c, "_".code, "_".code);
 			};
 			case SfLocal(v): printf(r, "%s", v.name);
+			case SfIdent(s): printf(r, "ident("); quoteString(s, r); printf(r, ")");
 			case SfDynamic(s, []): printf(r, "raw("); quoteString(s, r); printf(r, ")");
 			case SfDynamic(_code, _args): {
 				if (_args.length >= 10) e.error("Too many arguments");

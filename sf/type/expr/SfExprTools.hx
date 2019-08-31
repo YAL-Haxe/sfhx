@@ -80,6 +80,7 @@ class SfExprTools {
 		switch (expr.def) {
 			case SfConst(_): f0();
 			case SfLocal(_): f0();
+			case SfIdent(_): f0();
 			case SfDynamic(_, w): fx(w);
 			case SfArrayAccess(a, i): f2(a, i);
 			case SfEnumAccess(a, _, i): f2(a, i);
@@ -141,6 +142,7 @@ class SfExprTools {
 		var out:Bool = switch (expr.def) {
 			case SfConst(_): f0();
 			case SfLocal(_): f0();
+			case SfIdent(_): f0();
 			case SfDynamic(_, w): fx(w);
 			case SfArrayAccess(a, i): f2(a, i);
 			case SfEnumAccess(a, _, i): f2(a, i);
@@ -250,6 +252,7 @@ class SfExprTools {
 				} else false;
 			};
 			case [SfLocal(v1), SfLocal(v2)]: v1.name == v2.name;
+			case [SfIdent(s1), SfIdent(s2)]: s1 == s2;
 			case [SfDynamic(s1, l1), SfDynamic(s2, l2)]: s1 == s2 && fx(l1, l2);
 			case [SfArrayAccess(a1, i1), SfArrayAccess(a2, i2)]: f(a1, a2) && f(i1, i2);
 			case [SfEnumAccess(a1, _, i1), SfEnumAccess(a2, _, i2)]: f(a1, a2) && f(i1, i2);
@@ -692,7 +695,7 @@ class SfExprTools {
 			case SfLocal(v): v.name == local.name ? 1 : 0;
 			
 			case SfConst(_) | SfStaticField(_, _) | SfBreak | SfContinue
-			| SfTypeExpr(_) | SfEnumField(_, _)
+			| SfTypeExpr(_) | SfEnumField(_, _) | SfIdent(_)
 			: 0;
 			
 			case SfArrayAccess(a, b) | SfEnumAccess(a, _, b) | SfBinop(_, a, b)

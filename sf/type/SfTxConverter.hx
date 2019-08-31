@@ -57,7 +57,7 @@ class SfTxConverter {
 			case TLocal(v): rd = SfLocal(SfVar.fromTVar(v));
 			case TArray(a, i): rd = SfArrayAccess(f(a), f(i));
 			case TBinop(o, a, b): rd = SfBinop(o, f(a), f(b));
-			case TIdent(s): rd = SfDynamic(s, []);
+			case TIdent(s): rd = SfIdent(s);
 			case TField(o, _fa): {
 				switch (_fa) {
 					case FStatic(_ct, _cf): {
@@ -72,7 +72,10 @@ class SfTxConverter {
 								// probably untyped Class.field, suspicious!
 								rd = SfDynamicField(new SfExpr(d, SfTypeExpr(c)), cf.name);
 							}
-						} else rd = SfDynamicField(new SfExpr(d, SfDynamic(ct.name, [])), cf.name);
+						} else {
+							//warning(e, "Typed static field access but class is missing");
+							rd = SfDynamicField(new SfExpr(d, SfIdent(ct.name)), cf.name);
+						}
 					};
 					case FInstance(_ct, _, _cf): {
 						var ct = _ct.get();

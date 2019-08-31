@@ -20,6 +20,9 @@ enum SfExprDef {
 	/** A raw piece of target-specific code. For all your horrible hacks. */
 	SfDynamic(code:String, args:Array<SfExpr>);
 	
+	/** A little better - it's a globally accessible identifier and all */
+	SfIdent(name:String);
+	
 	/** array[index] */
 	SfArrayAccess(array:SfExpr, index:SfExpr);
 	
