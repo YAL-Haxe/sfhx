@@ -511,6 +511,8 @@ class SfExprTools {
 			case SfConst(_): true;
 			case SfLocal(_): true;
 			case SfArrayAccess(q, i): isSimple(q) && isSimple(i);
+			case SfEnumAccess(q, _, i): isSimple(q) && isSimple(i);
+			case SfEnumParameter(q, _, i): isSimple(q);
 			case SfStaticField(_, _): true;
 			case SfInstField(q, _), SfDynamicField(q, _): isSimple(q);
 			case SfBinop(o, a, b): switch (o) {
