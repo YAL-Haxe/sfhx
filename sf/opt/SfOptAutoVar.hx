@@ -46,8 +46,14 @@ class SfOptAutoVar extends SfOptImpl {
 			};
 			case SfBlock(m): {
 				var k = m.length - 1;
-				while (--k >= 0) switch (m[k].def) {
-					case SfVarDecl(v, true, vx): do {
+				while (--k >= 0) {
+					var v:SfVar, vx:SfExpr;
+					switch (m[k].def) {
+						case SfVarDecl(_v, true, _vx): v = _v; vx = _vx;
+						default: continue;
+					}
+					var done = false;
+					do {
 						// avoid certain expressions:
 						switch (vx.def) {
 							case SfFunction(_): continue; // don't rearrange functions
@@ -60,12 +66,6 @@ class SfOptAutoVar extends SfOptImpl {
 						// must contain exactly one read:
 						var vc = next.countLocalExt(v);
 						if (vc.writes != 0) continue;
-						if (vc.reads == 0) {
-							if (e.countLocalExt(v).total == 0 && vx.isSimple()) { // not used at all?
-								m.splice(k, 1);
-							}
-							continue;
-						}
 						if (vc.reads != 1) continue;
 						// must be the only occurrence in the block too:
 						if (e.countLocalExt(v).total != 1) continue;
@@ -84,9 +84,13 @@ class SfOptAutoVar extends SfOptImpl {
 						vx.setType(v.type);
 						next.replaceLocal(v, vx);
 						m.splice(k, 1);
+						done = true;
 					} while (false);
-					default:
-				} // switch (m[k])
+					if (!done && e.countLocal(v) == 0 && vx.isSimple()) {
+						// not used at all?
+						m.splice(k, 1);
+					}
+				}
 				if (m.length == 1) e.setTo(m[0].def);
 			}; // case SfBlock
 			default:
