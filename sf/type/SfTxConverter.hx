@@ -118,7 +118,20 @@ class SfTxConverter {
 						rd = SfDynamicField(f(o), s);
 					};
 					case FAnon(_cf): {
-						//warning(e, "anon field access ." + _cf.get());
+						// https://github.com/HaxeFoundation/haxe/issues/8919
+						switch (o.t) {
+							case TAnonymous(_): {
+								switch (o.expr) {
+									case TLocal(v): {
+										var t1 = v.t;
+										if (t1 != null) o.t = t1;
+									}
+									default:
+								}
+							};
+							default:
+						}
+						//warning(e, "anon field access from " + o.t + " field " + _cf.get());
 						rd = SfDynamicField(f(o), _cf.get().name);
 					};
 					default: error(e, "Can't convert TField::" + _fa.getName());
