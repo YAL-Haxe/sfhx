@@ -73,7 +73,7 @@ class SfTxConverter {
 								rd = SfDynamicField(new SfExpr(d, SfTypeExpr(c)), cf.name);
 							}
 						} else {
-							//warning(e, "Typed static field access but class is missing");
+							//warning(e, 'Typed static field access (${ct.name}.${cf.name}), but class is missing');
 							rd = SfDynamicField(new SfExpr(d, SfIdent(ct.name)), cf.name);
 						}
 					};
@@ -85,8 +85,14 @@ class SfTxConverter {
 							var sf = c.instMap[cf.name];
 							if (sf != null) {
 								rd = SfInstField(f(o), sf);
-							} else rd = SfDynamicField(f(o), cf.name);
-						} else rd = SfDynamicField(f(o), cf.name);
+							} else {
+								//warning(e, 'Typed instance field access (${ct.name}.${cf.name}), but field is missing');
+								rd = SfDynamicField(f(o), cf.name);
+							}
+						} else {
+							//warning(e, 'Typed instance field access (${ct.name}.${cf.name}), but class is missing');
+							rd = SfDynamicField(f(o), cf.name);
+						}
 					};
 					case FEnum(_et, ef): {
 						var et = _et.get();
@@ -107,8 +113,14 @@ class SfTxConverter {
 							} else error(e, "Could not find field " + cf.name);
 						} else error(e, "Could not find class " + c.name);
 					};
-					case FDynamic(s): rd = SfDynamicField(f(o), s);
-					case FAnon(_cf): rd = SfDynamicField(f(o), _cf.get().name);
+					case FDynamic(s): {
+						//warning(e, "dynamic field access ." + s);
+						rd = SfDynamicField(f(o), s);
+					};
+					case FAnon(_cf): {
+						//warning(e, "anon field access ." + _cf.get());
+						rd = SfDynamicField(f(o), _cf.get().name);
+					};
 					default: error(e, "Can't convert TField::" + _fa.getName());
 				}
 			};
