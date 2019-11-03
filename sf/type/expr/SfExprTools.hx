@@ -421,6 +421,7 @@ class SfExprTools {
 	private static var sourceCache:Map<String, String> = new Map();
 	/** Retrieves source code for given Position. This is not fast. */
 	public static function getSource(pos:Position):String {
+		if (pos == null) return null;
 		var inf = Context.getPosInfos(pos), src:String;
 		var file = inf.file;
 		if (sourceCache.exists(file)) {
