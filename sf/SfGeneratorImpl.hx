@@ -305,7 +305,7 @@ class SfGeneratorImpl {
 	}
 	
 	public function printConst(r:SfBuffer, value:TConstant, expr:SfExpr) {
-		var pos = SfExprTools.getPos(expr);
+		var pos = expr != null ? SfExprTools.getPos(expr) : null;
 		switch (value) {
 			case TInt(i): r.addInt(i);
 			case TFloat(s): r.addString(s);
