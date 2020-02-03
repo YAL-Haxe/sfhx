@@ -65,11 +65,11 @@ class SfOptSwitchSimple extends SfOptImpl {
 				var pos = sff.classField.pos;
 				switch (sff.kind) {
 					case FMethod(_): {};
-					default: Context.error("Can't apply :sf.unwrapper to vars", pos); continue;
+					default: pos.errorAt("Can't apply :sf.unwrapper to vars"); continue;
 				}
 				var expr = sff.expr;
 				if (expr == null) {
-					Context.error("Can't apply :sf.unwrapper to functions with no body", pos);
+					pos.errorAt("Can't apply :sf.unwrapper to functions with no body");
 					continue;
 				}
 				var unpacked = expr.unpack();
@@ -81,8 +81,8 @@ class SfOptSwitchSimple extends SfOptImpl {
 						a.def = then.def;
 					}
 					default: {
-						Context.error(":sf.unwrapper functions can only have a one-case switch, got "
-							+ unpacked.def.getName(), pos);
+						pos.errorAt(":sf.unwrapper functions can only have a one-case switch, got "
+							+ unpacked.def);
 					};
 				}
 			}
