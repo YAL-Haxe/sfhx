@@ -373,8 +373,9 @@ class SfExprTools {
 		return false;
 	}
 	
-	/** Throws an error at the position of this expr */
-	public static function error<T>(expr:SfExpr, text:String):T {
+	
+	/** Throws an error at the position, dumps if needed */
+	public static function errorAt<T>(pos:Position, text:String):T {
 		if (sfConfig.dump != null && sfConfig.dump != "pre") {
 			sys.io.File.saveContent("sf.sfdump", SfDump.get());
 		}
@@ -389,7 +390,7 @@ class SfExprTools {
 			text = '[$loc] ' + text;
 		}*/
 		text += haxe.CallStack.toString(stack);
-		Context.error(text, getPos(expr));
+		Context.error(text, pos);
 		#else
 		throw text;
 		#end
@@ -397,13 +398,23 @@ class SfExprTools {
 	}
 	
 	/** Throws an error at the position of this expr */
-	public static function warning<T>(expr:SfExpr, text:String):T {
+	public static function error<T>(expr:SfExpr, text:String):T {
+		return inline errorAt(getPos(expr), text);
+	}
+	
+	/** Shows a warning at a position */
+	public static function warningAt<T>(pos:Position, text:String):T {
 		#if (macro)
-		haxe.macro.Context.warning(text, getPos(expr));
+		haxe.macro.Context.warning(text, pos);
 		#else
 		trace(text);
 		#end
 		return null;
+	}
+	
+	/** Shows a warning at the position of this expr */
+	public static inline function warning<T>(expr:SfExpr, text:String):T {
+		return warningAt(getPos(expr), text);
 	}
 	
 	public static inline function setTo(expr:SfExpr, value:SfExprDef) {
