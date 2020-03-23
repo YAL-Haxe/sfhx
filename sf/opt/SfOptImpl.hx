@@ -24,17 +24,22 @@ class SfOptImpl {
 	public var currentClass:SfClass;
 	public var currentField:SfClassField;
 	
+	/** Causes forEach* operations to skip extern/@:remove items */
+	public var ignoreHidden:Bool;
+	
 	public function forEachClassField(func:SfClassField->Void) {
 		var g = sfGenerator;
 		for (_class in g.classList) {
+			if (ignoreHidden && _class.isHidden) continue;
 			currentClass = _class;
 			currentField = null;
 			for (_field in _class.fieldList) {
+				if (ignoreHidden && _field.isHidden) continue;
 				xt2 = _field;
 				currentField = _field;
 				func(_field);
 			}
-			if (_class.constructor != null) {
+			if (_class.constructor != null && (!ignoreHidden || !_class.constructor.isHidden)) {
 				xt2 = _class.constructor;
 				currentField = _class.constructor;
 				func(_class.constructor);
@@ -54,15 +59,17 @@ class SfOptImpl {
 			}
 		}
 		for (_class in g.classList) {
+			if (ignoreHidden && _class.isHidden) continue;
 			currentClass = _class;
 			currentField = null;
 			f(_class.init);
 			for (_field in _class.fieldList) {
+				if (ignoreHidden && _field.isHidden) continue;
 				xt2 = _field.expr;
 				currentField = _field;
 				f(_field.expr);
 			}
-			if (_class.constructor != null) {
+			if (_class.constructor != null && (!ignoreHidden || !_class.constructor.isHidden)) {
 				currentField = _class.constructor;
 				xt2 = currentField.expr;
 				f(_class.constructor.expr);
