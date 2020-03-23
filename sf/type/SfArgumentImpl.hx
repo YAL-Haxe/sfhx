@@ -24,6 +24,11 @@ class SfArgumentImpl {
 		return new SfArgument(SfVar.fromTVar(a.v), val);
 		#end
 	}
+	public function toString():String {
+		var r = v.name + ":" + v.type;
+		if (value != null) r += "=" + value;
+		return r;
+	}
 }
 #if (haxe_ver <= "4.0.0-preview.4")
 private typedef SfArgumentRaw = {v:TVar, value:Null<TConstant>};
