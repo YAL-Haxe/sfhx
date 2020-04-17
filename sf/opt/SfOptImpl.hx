@@ -63,16 +63,19 @@ class SfOptImpl {
 			currentClass = _class;
 			currentField = null;
 			f(_class.init);
+			//
 			for (_field in _class.fieldList) {
 				if (ignoreHidden && _field.isHidden) continue;
 				xt2 = _field.expr;
 				currentField = _field;
 				f(_field.expr);
 			}
-			if (_class.constructor != null && (!ignoreHidden || !_class.constructor.isHidden)) {
-				currentField = _class.constructor;
-				xt2 = currentField.expr;
-				f(_class.constructor.expr);
+			//
+			var _new = _class.constructor;
+			if (_new != null && (!ignoreHidden || !_new.isHidden)) {
+				currentField = _new;
+				xt2 = _new.expr;
+				f(_new.expr);
 			}
 		}
 		currentClass = null;
@@ -83,38 +86,36 @@ class SfOptImpl {
 	public function matchEachExpr(func:SfExprMatchIter, ?stack:Array<SfExpr>):Bool {
 		var e:SfExpr;
 		var g = sfGenerator;
+		var fx:SfExpr;
 		inline function f(x:SfExpr):Bool {
-			return func(x, stack, func);
+			fx = x;
+			return fx != null && func(fx, stack, func);
 		}
-		for (c in g.classList) {
-			currentClass = c;
-			e = c.init;
-			if (e != null) {
-				currentField = null;
-				if (f(e)) return true;
-			}
-			var ctr = c.constructor;
-			if (ctr != null) {
-				e = ctr.expr;
-				if (e != null) {
-					currentField = ctr;
-					if (f(e)) return true;
-				}
-			}
-			for (q in c.fieldList) {
-				e = q.expr;
-				if (e != null) {
-					currentField = q;
-					if (f(e)) return true;
-				}
-			}
-		}
-		e = g.mainExpr;
-		if (e != null) {
-			currentClass = null;
+		for (_class in g.classList) {
+			if (ignoreHidden && _class.isHidden) continue;
+			currentClass = _class;
 			currentField = null;
-			if (f(e)) return true;
+			if (f(_class.init)) return true;
+			//
+			for (_field in _class.fieldList) {
+				if (ignoreHidden && _field.isHidden) continue;
+				xt2 = _field.expr;
+				currentField = _field;
+				if (f(_field.expr)) return true;
+			}
+			//
+			var _new = _class.constructor;
+			if (_new != null && (!ignoreHidden || !_new.isHidden)) {
+				currentField = _new;
+				xt2 = _new.expr;
+				if (f(_new.expr)) return true;
+			}
 		}
+		//
+		currentClass = null;
+		currentField = null;
+		if (f(g.mainExpr)) return true;
+		//
 		return false;
 	}
 }
