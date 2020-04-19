@@ -47,6 +47,7 @@ class SfExprTools {
 				case TSuper: TSuper;
 			});
 			case SfLocal(v): SfLocal(v.clone());
+			case SfIdent(s): SfIdent(s);
 			case SfDynamic(s, w): SfDynamic(s, fx(w));
 			case SfUnop(o, p, x): SfUnop(o, p, f(x));
 			case SfArrayAccess(o, i): SfArrayAccess(f(o), f(i));
