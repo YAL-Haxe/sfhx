@@ -34,7 +34,17 @@ class SfGeneratorImpl {
 	public var abstractMap:SfTypeMap<SfAbstract> = new SfTypeMap();
 	public var anonList:Array<SfAnon> = [];
 	public var anonMap:SfTypeMap<SfAnon> = new SfTypeMap();
+	
 	public var realMap:Map<String, SfType> = new Map();
+	public function findRealClass(path:String):SfClass {
+		var c = realMap[path];
+		return (c == null || Std.is(c, SfClass)) ? cast c : null;
+	}
+	public function findRealClassField(classPath:String, fieldName:String):SfClassField {
+		var c = realMap[classPath];
+		if (c == null || !Std.is(c, SfClass)) return null;
+		return (cast c:SfClass).realMap[fieldName];
+	}
 	
 	//{ Default types
 	public var typeArray:SfClass;
