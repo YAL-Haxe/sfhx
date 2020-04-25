@@ -390,7 +390,7 @@ class SfDump {
 			};
 			case SfBreak: printf(r, "break");
 			case SfContinue: printf(r, "continue");
-			case SfCast(e, t): printf(r, "cast("); f(e); printf(r, ", %s)", t.name);
+			case SfCast(e, t): printf(r, "cast("); f(e); printf(r, ", %s)", t != null ? t.name : null);
 			case SfTypeOf(e): printf(r, "typeof("); f(e); printf(r, ")");
 			case SfTry(x, cc): {
 				printf(r, "try ");

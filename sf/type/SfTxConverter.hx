@@ -335,7 +335,7 @@ class SfTxConverter {
 			case TBreak: rd = SfBreak;
 			case TContinue: rd = SfContinue;
 			case TThrow(r): rd = SfThrow(f(r));
-			case TCast(q, null): r = f(q);
+			case TCast(q, null): rd = SfCast(f(q), null);
 			case TCast(q, mt): {
 				// todo
 				var sft:SfType = switch (mt) {
