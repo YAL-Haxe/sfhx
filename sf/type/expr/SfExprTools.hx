@@ -108,7 +108,14 @@ class SfExprTools {
 			case SfWhile(c, e, _): f2(c, e);
 			case SfCFor(a, b, c, d): f2(a, b); f2(c, d);
 			case SfForEach(_, o, e): f2(o, e);
-			case SfSwitch(e, w, z, d): f1(e); for (o in w) f1(o.expr); if (z) f1(d);
+			case SfSwitch(e, cc, z, d): {
+				f1(e);
+				for (c in cc) {
+					for (v in c.values) f1(v);
+					f1(c.expr);
+				}
+				if (z) f1(d);
+			}
 			case SfTry(e, w): f1(e); for (o in w) f1(o.expr);
 			case SfReturn(z, e): if (z) f1(e);
 			case SfBreak: f0();
@@ -183,7 +190,13 @@ class SfExprTools {
 				} else {
 					n = w.length;
 					i = 0; while (i < n) {
-						if (f1(w[i].expr)) break;
+						var c = w[i];
+						var cv = c.values;
+						var vn = cv.length;
+						var vi = -1; while (++vi < vn) {
+							if (f1(cv[vi])) break;
+						}
+						if (vi < vn || f1(c.expr)) break;
 						i += 1;
 					}
 					i < n || (z && f1(d));
