@@ -196,7 +196,9 @@ class SfTxConverter {
 				}
 				switch (o.expr) {
 					case TLocal({ name: _name }), TIdent(_name): switch (_name) {
+						#if !sf_dynamic_trace
 						case "`trace": r = procTrace(m);
+						#end
 						case "__js__" | "__raw__": {
 							if (m.length < 1) error(e, "Requires one or more arguments.");
 							sfStr = switch (m[0].expr) {
