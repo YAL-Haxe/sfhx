@@ -59,6 +59,7 @@ class SfExprTools {
 			case SfIf(x1, x2, z, x3): SfIf(f(x1), f(x2), z, f(x3));
 			case SfParenthesis(x): SfParenthesis(f(x));
 			case SfBinop(o, a, b): SfBinop(o, f(a), f(b));
+			case SfCast(x, t): SfCast(f(x), t);
 			default: expr.error("SfExprTools.clone: Can't clone " + expr.getName());
 		}
 		return expr.mod(nd);
