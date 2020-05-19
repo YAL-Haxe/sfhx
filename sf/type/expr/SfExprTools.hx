@@ -461,6 +461,10 @@ class SfExprTools {
 		return src.substring(inf.min, inf.max);
 	}
 	
+	public static inline function getTypedExpr(expr:SfExpr):TypedExpr {
+		return expr.data;
+	}
+	
 	public static inline function getType(expr:SfExpr):Type {
 		return expr.data.t;
 	}
