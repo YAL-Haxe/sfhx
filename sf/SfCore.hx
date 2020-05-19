@@ -1,4 +1,5 @@
 package sf;
+import haxe.macro.JSGenApi;
 import haxe.macro.Type;
 import sf.SfGenerator;
 import sf.type.SfBuffer;
@@ -12,6 +13,8 @@ class SfCore {
 	
 	/** The current SfGenerator */
 	public static var sfGenerator:SfGenerator = null;
+	
+	public static var jsGenAPI:JSGenApi;
 	
 	/** Config holder */
 	public static var sfConfig:SfConfig = null;
@@ -38,7 +41,8 @@ class SfCore {
 		SfGenerator.main();
 		if (Context.defined("js")) {
 			var sfg = new SfGenerator();
-			haxe.macro.Compiler.setCustomJSGenerator(function(api:haxe.macro.JSGenApi) {
+			haxe.macro.Compiler.setCustomJSGenerator(function(api:JSGenApi) {
+				jsGenAPI = api;
 				try {
 					sfg.compile(api.types, api.main, api.outputFile);
 				} catch (e:Dynamic) {
