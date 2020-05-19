@@ -98,34 +98,46 @@ class SfOptAutoVar extends SfOptImpl {
 	}
 	
 	private var inlineVarData:Map<String, { expr:SfExpr, val:SfExpr, par:SfExpr }>;
-	public function inlineIter(e:SfExpr, w:SfExprList, f:SfExprIter) {
-		e.iter(w, f);
-		switch (e.def) {
+	public function inlineIter(expr:SfExpr, st:SfExprList, it:SfExprIter) {
+		expr.iter(st, it);
+		switch (expr.def) {
 			case SfVarDecl(v, _, x): {
-				inlineVarData.set(v.name, { expr: e, val: x, par: w[0] });
+				inlineVarData.set(v.name, { expr: expr, val: x, par: st[0] });
 			};
-			case SfBlock(xw): {
-				var n = xw.length;
+			case SfBlock(stats): {
+				var n = stats.length;
 				var i = -1; while (++i < n) {
-					var curr = xw[i];
-					// see that it's var v1 = v0;
-					var v0:SfVar, v1:SfVar;
+					var curr = stats[i];
+					
+					// see that it's `var vDef = /* local */vVal`;
+					var vDef:SfVar, vVal:SfVar;
 					switch (curr.def) {
-						case SfVarDecl(v, true, _.def => SfLocal(vv)): v0 = vv; v1 = v;
+						case SfVarDecl(vd, true, _.def => SfLocal(vv)): {
+							vDef = vd;
+							vVal = vv;
+						};
 						default: continue;
 					};
-					// see that v0 is declared in this same block:
-					var data = inlineVarData.get(v0.name);
-					if (data == null || data.par != e) continue;
-					// see that v0 is never used again:
+					
+					// see that vVal is declared in this same block:
+					var data = inlineVarData.get(vVal.name);
+					if (data == null || data.par != expr) continue;
+					
+					// see that vVal is never used afterwards:
 					var k = i; while (++k < n) {
-						if (xw[k].countLocal(v0) > 0) break;
+						if (stats[k].countLocal(vVal) > 0) break;
 					}
 					if (k < n) continue;
+					
 					//
-					data.expr.def = SfVarDecl(v1, data.val != null, data.val);
-					e.replaceLocal(v0, curr.mod(SfLocal(v1)));
-					xw.splice(i, 1);
+					data.expr.def = SfVarDecl(vDef, data.val != null, data.val);
+					expr.replaceLocal(vVal, curr.mod(SfLocal(vDef)));
+					var ndata = inlineVarData[vDef.name];
+					if (ndata != null) {
+						ndata.expr = data.expr;
+						ndata.val = data.val;
+					}
+					stats.splice(i, 1);
 					i -= 1; n -= 1;
 				}
 			};
