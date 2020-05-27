@@ -350,9 +350,8 @@ class SfGeneratorImpl {
 	 * Should print an expression to the given buffer.
 	 * @param	r	Target buffer
 	 * @param	expr	Expression to be printed.
-	 * @param	wrap	Wrap mode (true: inline, null: normal, false: block)
 	 */
-	public function printExpr(r:SfBuffer, expr:SfExpr, ?wrap:Bool):Void {
+	public function printExpr(r:SfBuffer, expr:SfExpr, flags:SfPrintFlags):Void {
 		throw "Not implemented.";
 	}
 	

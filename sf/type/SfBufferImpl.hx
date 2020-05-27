@@ -99,9 +99,9 @@ class SfBufferImpl extends SfBufferBase {
 	}
 	
 	/** Adds an expression */
-	public function addExpr(e:SfExpr, wrap:Bool) {
+	public function addExpr(e:SfExpr, flags:SfPrintFlags) {
 		#if !display
-		sfGenerator.printExpr(cast this, e, wrap);
+		sfGenerator.printExpr(cast this, e, flags);
 		#end
 	}
 	
@@ -112,7 +112,7 @@ class SfBufferImpl extends SfBufferBase {
 			addSep();
 		} else {
 			addLine(1);
-			addExpr(e, false);
+			addExpr(e, SfPrintFlags.StatWrap);
 			addSemico();
 			addLine( -1);
 		}
@@ -165,25 +165,25 @@ class SfBufferImpl extends SfBufferBase {
 	/** Adds */
 	public function addParExpr(e:SfExpr) {
 		addParOpen();
-		addExpr(e, true);
+		addExpr(e, SfPrintFlags.ExprWrap);
 		addParClose();
 	}
 	
 	public function addParExpr2(e1:SfExpr, e2:SfExpr) {
 		addParOpen();
-		addExpr(e1, true);
+		addExpr(e1, SfPrintFlags.ExprWrap);
 		addComma();
-		addExpr(e2, true);
+		addExpr(e2, SfPrintFlags.ExprWrap);
 		addParClose();
 	}
 	
 	public function addParExpr3(e1:SfExpr, e2:SfExpr, e3:SfExpr) {
 		addParOpen();
-		addExpr(e1, true);
+		addExpr(e1, SfPrintFlags.ExprWrap);
 		addComma();
-		addExpr(e2, true);
+		addExpr(e2, SfPrintFlags.ExprWrap);
 		addComma();
-		addExpr(e3, true);
+		addExpr(e3, SfPrintFlags.ExprWrap);
 		addParClose();
 	}
 	//}

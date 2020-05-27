@@ -104,9 +104,9 @@ class SfPrintf {
 			case addInt: buf.addInt(next());
 			case addChar: buf.addChar(next());
 			case addConst: SfCore.sfGenerator.printConst(buf, next(), null);
-			case addExpr: buf.addExpr(next(), true);
-			case addStat: buf.addExpr(next(), false);
-			case addBlock: buf.addExpr(next(), null);
+			case addExpr: buf.addExpr(next(), SfPrintFlags.Inline);
+			case addStat: buf.addExpr(next(), SfPrintFlags.StatWrap);
+			case addBlock: buf.addExpr(next(), SfPrintFlags.Stat);
 			case addArgs: buf.addArguments(next());
 			case addTArgs: buf.addTrailArgs(next());
 			case addIncLine: buf.addLine(1);
