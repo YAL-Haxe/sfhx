@@ -1,4 +1,5 @@
 package sf.type;
+import sf.type.SfPrintFlags;
 
 /**
  * Just you look at that, a non-macros printf.
@@ -50,16 +51,16 @@ class SfPrintf {
 						case "s".code: out.push(SfPrintfNode.addString);
 						case "d".code: out.push(SfPrintfNode.addInt);
 						case "c".code: out.push(SfPrintfNode.addChar);
-						case "x".code: out.push(SfPrintfNode.addExpr);
+						case "x".code: out.push(SfPrintfNode.addExpr(SfPrintFlags.Inline));
 						case "(".code: {
 							start = ++pos;
 							pos = fmt.indexOf(")", start);
 							var name = fmt.substring(start, pos);
 							switch (name) {
 								case "const": out.push(SfPrintfNode.addConst);
-								case "stat": out.push(SfPrintfNode.addStat);
-								case "block": out.push(SfPrintfNode.addBlock);
-								case "expr": out.push(SfPrintfNode.addExpr);
+								case "stat": out.push(SfPrintfNode.addExpr(SfPrintFlags.StatWrap));
+								case "block": out.push(SfPrintfNode.addExpr(SfPrintFlags.Stat));
+								case "expr": out.push(SfPrintfNode.addExpr(SfPrintFlags.Inline));
 								case "args": out.push(SfPrintfNode.addArgs);
 								case "targs": out.push(SfPrintfNode.addTArgs);
 								case "+\n": out.push(SfPrintfNode.addIncLine);
@@ -104,9 +105,7 @@ class SfPrintf {
 			case addInt: buf.addInt(next());
 			case addChar: buf.addChar(next());
 			case addConst: SfCore.sfGenerator.printConst(buf, next(), null);
-			case addExpr: buf.addExpr(next(), SfPrintFlags.Inline);
-			case addStat: buf.addExpr(next(), SfPrintFlags.StatWrap);
-			case addBlock: buf.addExpr(next(), SfPrintFlags.Stat);
+			case addExpr(flags): buf.addExpr(next(), flags);
 			case addArgs: buf.addArguments(next());
 			case addTArgs: buf.addTrailArgs(next());
 			case addIncLine: buf.addLine(1);
@@ -144,9 +143,7 @@ enum SfPrintfNode {
 	addInt;
 	addChar;
 	addConst;
-	addExpr;
-	addStat;
-	addBlock;
+	addExpr(flags:SfPrintFlags);
 	addArgs;
 	addTArgs;
 	addIncLine;
