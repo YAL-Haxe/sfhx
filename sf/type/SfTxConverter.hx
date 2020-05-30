@@ -101,7 +101,7 @@ class SfTxConverter {
 							var sff = sfe.ctrList[ef.index];
 							if (sff != null) {
 								rd = SfEnumField(sfe, sff);
-							} else error(e, "Could not find " + ef.name + " in " + et.name);
+							} else error(e, 'Could not find enum field ${ef.name} (id ${ef.index}) in ${et.name}');
 						} else error(e, "Could not find enum " + et.name);
 					};
 					case FClosure({ c: _.get() => c }, _.get() => cf): {
@@ -373,7 +373,7 @@ class SfTxConverter {
 				}
 				var sfEnum = sfGenerator.enumMap.baseGet(et);
 				if (sfEnum == null) error(e, "Could not find enum " + et.name);
-				var sfEnumCtr = sfEnum.ctrMap[ef.name];
+				var sfEnumCtr = sfEnum.realMap[ef.name];
 				if (sfEnumCtr == null) error(e, "Could not find " + ef.name + " in " + sfEnum.name);
 				rd = SfEnumParameter(f(x), sfEnumCtr, i);
 			};

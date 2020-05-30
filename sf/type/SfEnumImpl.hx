@@ -20,6 +20,7 @@ class SfEnumImpl extends SfType {
 	public var ctrList:Array<SfEnumCtr> = [];
 	
 	public var ctrMap:Map<String, SfEnumCtr> = new Map();
+	public var realMap:Map<String, SfEnumCtr> = new Map();
 	
 	public var indexMap:Vector<SfEnumCtr>;
 	
@@ -44,6 +45,7 @@ class SfEnumImpl extends SfType {
 			var sfc = new SfEnumCtr(cast this, c);
 			ctrList.push(sfc);
 			ctrMap[sfc.name] = sfc;
+			realMap[sfc.realName] = sfc;
 			hasArgs = hasArgs || sfc.args.length > 0;
 		}
 		ctrList.sort(enumCtrSort);
