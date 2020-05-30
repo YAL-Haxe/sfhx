@@ -290,7 +290,7 @@ class SfDump {
 					printf(r, ".?");
 				}
 			};
-			case SfInstField(o, q): f(o); printf(r, "./* inst */%s", q.name);
+			case SfInstField(o, q): f(o); printf(r, "./* %s */%s", q.parentClass.realName, q.name);
 			case SfDynamicField(o, s): f(o); printf(r, "./* dyn */%s", s);
 			case SfParenthesis(e): printf(r, "("); fw(e); printf(r, ")");
 			case SfVarDecl(v, z, e): {
@@ -337,6 +337,10 @@ class SfDump {
 				printf(r, ") "); fb(e);
 			};
 			case SfSwitch(x, m, _, d): {
+				var e:SfEnum = switch (x.unpack().def) {
+					case SfEnumAccess(_, e1, _): e1;
+					default: null;
+				}
 				printf(r, "switch "); fw(x); printf(r, " {");
 				r.indent += 1;
 				for (c in m) {
@@ -346,6 +350,12 @@ class SfDump {
 					for (v in c.values) {
 						if (comma) printf(r, ", "); else comma = true;
 						fw(v);
+						if (e != null) switch (v.def) {
+							case SfConst(TInt(i)): {
+								printf(r, "/* %s */", i < e.ctrList.length ? e.ctrList[i].realName : "?");
+							};
+							default:
+						}
 					}
 					printf(r, ": ");
 					var cx = c.expr;
