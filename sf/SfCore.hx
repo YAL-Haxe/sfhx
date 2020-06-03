@@ -4,6 +4,7 @@ import haxe.macro.Type;
 import sf.SfGenerator;
 import sf.type.SfBuffer;
 import haxe.macro.Context;
+import haxe.extern.Rest;
 
 /**
  * ...
@@ -19,9 +20,30 @@ class SfCore {
 	/** Config holder */
 	public static var sfConfig:SfConfig = null;
 	
-	public static var printf:SfBuffer->String->haxe.extern.Rest<Dynamic>->SfBuffer = Reflect.makeVarArgs(sf.type.SfPrintf.printf);
+	/**
+	Formatted output. Supported tags:
+	`         Optional space
+	%`        An actual backtick
+	;         Semicolon (omitted if immediately after a closing curly bracket)
+	%s        A String
+	%d        An Int
+	%c        An Int as a charcode
+	%x        An inline expression (flags=Expr)
+	%w        A wrapped inline expression (flags=ExprWrap)
+	%(const)  A TConst
+	%(stat)   A wrapped statement (flags=StatWrap)
+	%(block)  A statement in a block, if needed (flags=Stat)
+	%(expr)   Same as %x
+	%(args)   An array of arguments ([a, b, c] -> `a, b, c`) via addArguments
+	%(targs)  An array of trailing arguments ([a, b, c] -> `, a, b, c`) via addTrailArgs
+	%(+\n)    Adds a line break with increased indentation (e.g. "if (x) {%(+\n)...")
+	%(-\n)    Adds a line break with decreased indentation (e.g. "...%(-\n)}")
+	Generators may implement additional tags by overriding SfGenerator.printFormat
+	**/
+	public static var printf:SfCore_printf = Reflect.makeVarArgs(sf.type.SfPrintf.printf);
 	
-	public static var sprintf:String->haxe.extern.Rest<Dynamic>->String = Reflect.makeVarArgs(sf.type.SfPrintf.sprintf);
+	/** Like printf, but returns a string */
+	public static var sprintf:SfCore_sprintf = Reflect.makeVarArgs(sf.type.SfPrintf.sprintf);
 	
 	/** exception tag */
 	public static var xt:Dynamic = null;
@@ -91,3 +113,6 @@ class SfCore {
 	}
 	
 }
+
+typedef SfCore_printf = (buf:SfBuffer, fmt:String, args:Rest<Dynamic>)->SfBuffer;
+typedef SfCore_sprintf = (fmt:String, args:Rest<Dynamic>)->String;

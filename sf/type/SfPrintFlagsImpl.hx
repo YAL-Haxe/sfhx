@@ -9,18 +9,20 @@ abstract SfPrintFlagsImpl(Int) from Int to Int {
 	/** Is an expression, as opposed to a statement */
 	public static inline var Inline:SfPrintFlags = (1 << 0);
 	
-	/** Is wrapped (inline: in parenthesis, statement: in curly brackets) */
+	/** Is wrapped (expr: in parenthesis, statement: in curly brackets) */
 	public static inline var Wrapped:SfPrintFlags = (1 << 1);
 	
-	/** Just a statement, such as in if (x) stat */
+	/** Shortcut for `expr` */
+	public static inline var Expr:SfPrintFlags = Inline;
+	
+	/** Just a statement, such as in `if (x) stat` */
 	public static inline var Stat:SfPrintFlags = 0;
 	
-	/** Shortcut for (expr) */
+	/** Shortcut for `(expr)` */
 	public static inline var ExprWrap:SfPrintFlags = Inline.with(Wrapped);
 	
-	/** Shortcut for {stat} */
+	/** Shortcut for `{stat}` */
 	public static inline var StatWrap:SfPrintFlags = Wrapped;
-	
 	
 	public static inline var MaxBase:SfPrintFlags = (1 << 2);
 	//

@@ -45,32 +45,55 @@ class SfPrintf {
 				};
 				case "%".code: {
 					flush();
-					switch (StringTools.fastCodeAt(fmt, ++pos)) {
+					var c = StringTools.fastCodeAt(fmt, ++pos);
+					var tag:String = null;
+					switch (c) {
 						case "`".code: out.push(SfPrintfNode.addAccent);
 						case ";".code: out.push(SfPrintfNode.markSemico);
-						case "s".code: out.push(SfPrintfNode.addString);
-						case "d".code: out.push(SfPrintfNode.addInt);
-						case "c".code: out.push(SfPrintfNode.addChar);
-						case "x".code: out.push(SfPrintfNode.addExpr(SfPrintFlags.Inline));
 						case "(".code: {
 							start = ++pos;
 							pos = fmt.indexOf(")", start);
-							var name = fmt.substring(start, pos);
-							switch (name) {
-								case "const": out.push(SfPrintfNode.addConst);
-								case "stat": out.push(SfPrintfNode.addExpr(SfPrintFlags.StatWrap));
-								case "block": out.push(SfPrintfNode.addExpr(SfPrintFlags.Stat));
-								case "expr": out.push(SfPrintfNode.addExpr(SfPrintFlags.Inline));
-								case "args": out.push(SfPrintfNode.addArgs);
-								case "targs": out.push(SfPrintfNode.addTArgs);
-								case "+\n": out.push(SfPrintfNode.addIncLine);
-								case "-\n": out.push(SfPrintfNode.addDecLine);
-								default: out.push(SfPrintfNode.addCustom(name));
-							}
-							start = pos + 1;
+							tag = fmt.substring(start, pos);
 						};
-						case "z".code: throw "No longer allowed.";
-						default: throw fmt.charAt(pos) + " is not a known type.";
+						default: {
+							if(c == "_".code
+							|| c >= "a".code && c <= "z".code
+							|| c >= "A".code && c <= "Z".code
+							) {
+								start = pos;
+								while (pos + 1 < length) {
+									c = StringTools.fastCodeAt(fmt, pos + 1);
+									if(c == "_".code
+									|| c >= "a".code && c <= "z".code
+									|| c >= "A".code && c <= "Z".code
+									|| c >= "0".code && c <= "9".code
+									) {
+										pos += 1;
+									} else break;
+								}
+								tag = fmt.substring(start, pos + 1);
+							} else {
+								throw '`${fmt.charAt(pos)}` ($c) is not a known type.';
+							}
+						};
+					}
+					if (tag != null) switch (tag) {
+						case "s": out.push(SfPrintfNode.addString);
+						case "d": out.push(SfPrintfNode.addInt);
+						case "c": out.push(SfPrintfNode.addChar);
+						//
+						case "x": out.push(SfPrintfNode.addExpr(SfPrintFlags.Expr));
+						case "w": out.push(SfPrintfNode.addExpr(SfPrintFlags.ExprWrap));
+						case "sx": out.push(SfPrintfNode.addExpr(SfPrintFlags.Stat));
+						case "sw": out.push(SfPrintfNode.addExpr(SfPrintFlags.StatWrap));
+						//
+						case "const": out.push(SfPrintfNode.addConst);
+						case "args": out.push(SfPrintfNode.addArgs);
+						case "targs": out.push(SfPrintfNode.addTArgs);
+						case "+\n": out.push(SfPrintfNode.addIncLine);
+						case "-\n": out.push(SfPrintfNode.addDecLine);
+						//
+						default: out.push(SfPrintfNode.addCustom(tag));
 					}
 					start = pos + 1;
 				};
