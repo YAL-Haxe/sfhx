@@ -58,9 +58,7 @@ class SfConfigImpl {
 		//
 	}
 	
-	private static var value_1:Map<String, String> = new Map();
 	public static function value(s:String):String {
-		if (value_1.exists(s)) return value_1[s];
 		var v = Context.definedValue(s);
 		if (v != null) return v;
 		// if things didn't work out, see if it's about dashes<->underscores:
@@ -69,7 +67,6 @@ class SfConfigImpl {
 		} else if (s.indexOf("_") >= 0) {
 			v = Context.definedValue(StringTools.replace(s, "_", "-"));
 		}
-		value_1.set(s, v);
 		return v;
 	}
 	
