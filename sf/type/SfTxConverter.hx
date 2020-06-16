@@ -366,10 +366,10 @@ class SfTxConverter {
 			};
 			case TEnumParameter(x, ef, i): {
 				var et:EnumType;
-				switch (x.t) {
+				switch (haxe.macro.TypeTools.followWithAbstracts(x.t)) {
 					case TType(_.get() => {type: TEnum(_et, _)}, _): et = _et.get();
 					case TEnum(_et, _): et = _et.get();
-					default: error(e, "Taking enum parameter of non-enum type?");
+					default: error(e, "Taking enum parameter of non-enum type? " + x.t);
 				}
 				var sfEnum = sfGenerator.enumMap.baseGet(et);
 				if (sfEnum == null) error(e, "Could not find enum " + et.name);
