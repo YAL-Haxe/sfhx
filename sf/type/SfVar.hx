@@ -7,7 +7,7 @@ import haxe.macro.Type;
  */
 class SfVar {
 	public var name:String;
-	public var id:Int;
+	public var id:Null<Int>;
 	public var type:Type;
 	public function new(name:String, type:Type, ?id:Int) {
 		this.name = SfCore.sfGenerator.getVarName(name);
@@ -24,6 +24,8 @@ class SfVar {
 		return new SfVar(tv.name, tv.t, tv.id);
 	}
 	public function toString():String {
-		return "SfVar(" + name + ":" + haxe.macro.TypeTools.toString(type) + ")";
+		var s = "SfVar(" + name + ":" + haxe.macro.TypeTools.toString(type);
+		if (id != null) s += "#" + id;
+		return s + ")";
 	}
 }
