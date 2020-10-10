@@ -150,8 +150,10 @@ class SfOptAutoVar extends SfOptImpl {
 	}
 	
 	override public function apply() {
+		#if !sf_no_opt_auto_var
 		forEachExpr(mainIter, []);
 		forEachExpr(inlineIterOuter, []);
+		#end
 	}
 	
 }
