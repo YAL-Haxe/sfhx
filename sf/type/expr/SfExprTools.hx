@@ -606,6 +606,7 @@ class SfExprTools {
 				case SfCFor(_, c, _, _): q == c;
 				case SfForEach(_, c, _): q == c;
 				case SfSwitch(c, _, _): q == c;
+				case SfTry(_, cc): false;
 				default: true;
 			}
 		}
