@@ -55,7 +55,7 @@ class SfEnumImpl extends SfType {
 				indexMap[sfc.index] = sfc;
 			}
 		}
-		isFake = !hasArgs;
+		isFake = false;
 	}
 	
 	public function renameCtr(c:SfEnumCtr, newName:String) {
