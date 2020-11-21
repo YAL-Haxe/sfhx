@@ -488,7 +488,7 @@ class SfExprTools {
 		expr.data.t = t;
 	}
 	
-	public static inline function unpack(expr:SfExpr):SfExpr {
+	public static function unpack(expr:SfExpr):SfExpr {
 		while (expr != null) switch (expr.def) {
 			case SfParenthesis(next): expr = next;
 			case SfBlock([next]): expr = next;
@@ -497,6 +497,19 @@ class SfExprTools {
 			default: break;
 		}
 		return expr;
+	}
+	public static function unpackStack(st:SfExprList, start:Int = 0):SfExpr {
+		for (i in start ... st.length) {
+			var x = st[i];
+			switch (x.def) {
+				case SfParenthesis(_): {};
+				case SfBlock([_]): {};
+				case SfCast(_, _): {};
+				case SfMeta(_, _): {};
+				default: return x;
+			}
+		}
+		return null;
 	}
 	
 	/** Returns whether an expression is nothing worth printing. */
