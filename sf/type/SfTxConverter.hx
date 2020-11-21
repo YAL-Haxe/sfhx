@@ -251,6 +251,9 @@ class SfTxConverter {
 									new SfExpr(c.data, SfDynamic("new {0}", [c])),
 									args);
 							};
+							case "delete": {
+								rd = SfDynamic("delete {0}[{1}]", [f(m[0]), f(m[1])]);
+							};
 							#end
 							case "instanceof": rd = SfInstanceOf(f(m[0]), f(m[1]));
 							case "typeof": rd = SfTypeOf(f(m[0]));
