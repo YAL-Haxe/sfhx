@@ -9,6 +9,7 @@ import sf.type.SfTypeImpl;
 import sf.opt.*;
 import haxe.macro.JSGenApi;
 import haxe.macro.Type;
+import sys.FileSystem;
 import sys.io.File;
 import Type in StdType;
 import sf.type.SfTypeMap;
@@ -292,18 +293,27 @@ class SfGeneratorImpl {
 			}
 		}
 		//
-		if (SfCore.sfConfig.dump == "pre") {
+		var dump = SfCore.sfConfig.dump;
+		var dumpInd = 0;
+		if (dump == "pre") {
 			SfTimes.mark("dump");
 			File.saveContent("sf.sfdump", SfDump.get());
+		} else if (dump == "opt") {
+			if (!FileSystem.exists("dump")) FileSystem.createDirectory("dump");
+			File.saveContent("dump/0 pre.sfdump", SfDump.get());
 		}
 		// small transformations:
 		for (o in getPreproc()) {
-			SfTimes.mark(StdType.getClassName(StdType.getClass(o)));
+			var name = StdType.getClassName(StdType.getClass(o));
+			SfTimes.mark(name);
 			o.apply();
+			if (dump == "opt") File.saveContent('dump/${++dumpInd} $name.sfdump', SfDump.get());
 		}
 		for (o in getOptimizers()) {
-			SfTimes.mark(StdType.getClassName(StdType.getClass(o)));
+			var name = StdType.getClassName(StdType.getClass(o));
+			SfTimes.mark(name);
 			o.apply();
+			if (dump == "opt") File.saveContent('dump/${++dumpInd} $name.sfdump', SfDump.get());
 		}
 		SfCore.xt = null;
 	}

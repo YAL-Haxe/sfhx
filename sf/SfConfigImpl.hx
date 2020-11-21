@@ -20,8 +20,8 @@ class SfConfigImpl {
 		var s = string("sf-dump");
 		switch (s) {
 			case null: null;
-			case "pre": s;
-			default: "post";
+			case "": "post";
+			default: s;
 		}
 	};
 	
