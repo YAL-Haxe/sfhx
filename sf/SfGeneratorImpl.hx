@@ -251,7 +251,6 @@ class SfGeneratorImpl {
 			r.push(new SfOptInlineBlock());
 			r.push(new SfOptStrayStatements());
 			r.push(new SfOptAutoVar());
-			r.push(new SfOptVarDeclAssign());
 		}
 		return r;
 	}

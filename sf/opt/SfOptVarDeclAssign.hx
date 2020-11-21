@@ -8,6 +8,7 @@ using sf.type.expr.SfExprTools;
 
 /**
  * `var some; some = value;` -> `var some = value;`
+ * No longer used as of 2020.
  * @author YellowAfterlife
  */
 class SfOptVarDeclAssign extends SfOptImpl {
