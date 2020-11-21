@@ -403,8 +403,9 @@ class SfDump {
 			case SfCast(e, t): printf(r, "cast("); f(e); printf(r, ", %s)", t != null ? t.name : null);
 			case SfTypeOf(e): printf(r, "typeof("); f(e); printf(r, ")");
 			case SfTry(x, cc): {
-				printf(r, "try ");
-				f(x);
+				printf(r, "try {%(+\n)");
+				fb(x);
+				printf(r, "%(-\n)}");
 				for (c in cc) {
 					printf(r, " catch (%s) ", c.v.name);
 					f(c.expr);
