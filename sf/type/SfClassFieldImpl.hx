@@ -124,10 +124,35 @@ class SfClassFieldImpl extends SfField {
 				case MethDynamic: printf(out, "dynamic ");
 				default:
 			}
+			case FVar(AccInline, AccNever): printf(out, "inline ");
 			default:
 		}
 		if (isVar && !isCallable) {
-			printf(out, "var %s:", name); SfDump.type(type, out);
+			printf(out, "var %s", name);
+			switch (classField.kind) {
+				case FVar(AccNormal, AccNormal): {};
+				case FVar(AccInline, AccNever): {};
+				case FVar(accRead, accWrite): {
+					out.addChar("(".code);
+					for (iter in 0 ... 2) {
+						var isRead = iter == 0;
+						var acc = isRead ? accRead : accWrite;
+						var s = switch (acc) {
+							case AccNormal: "default";
+							case AccCall: isRead ? "get" : "set";
+							case AccNo: "null";
+							case AccNever: "never";
+							default: "" + acc;
+						}
+						out.addString(s);
+						if (isRead) out.addString(", ");
+					}
+					out.addChar(")".code);
+				};
+				default: {};
+			}
+			printf(out, ":");
+			SfDump.type(type, out);
 			if (expr != null) {
 				printf(out, " = ");
 				sf.type.SfDump.expr(expr, out);
