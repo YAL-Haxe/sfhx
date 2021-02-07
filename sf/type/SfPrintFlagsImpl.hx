@@ -42,6 +42,9 @@ abstract SfPrintFlagsImpl(Int) from Int to Int {
 	public function hasAll(flag:SfPrintFlags):Bool {
 		return (this & flag) == flag;
 	}
+	public inline function hasNone(flag:SfPrintFlags):Bool {
+		return (this & flag) == 0;
+	}
 	//
 	public inline function with(flag:SfPrintFlags):SfPrintFlags {
 		return this | flag;
