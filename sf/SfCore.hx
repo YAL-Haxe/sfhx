@@ -5,6 +5,7 @@ import sf.SfGenerator;
 import sf.type.SfBuffer;
 import haxe.macro.Context;
 import haxe.extern.Rest;
+import sf.type.SfPrintf;
 
 /**
  * ...
@@ -40,10 +41,32 @@ class SfCore {
 	%(-\n)    Adds a line break with decreased indentation (e.g. "...%(-\n)}")
 	Generators may implement additional tags by overriding SfGenerator.printFormat
 	**/
-	public static var printf:SfCore_printf = Reflect.makeVarArgs(sf.type.SfPrintf.printf);
+	#if (haxe >= "4.2")
+	public static function printf(buf:SfBuffer, format:String, params:Rest<Dynamic>):SfBuffer {
+		SfPrintf.proc(buf, format, params.toArray());
+		return buf;
+	}
+	#else
+	public static var printf:SfCore_printf = Reflect.makeVarArgs(function(params:Array<Dynamic>):Dynamic {
+		SfPrintf.proc(null, null, params);
+		return params[0];
+	});
+	#end
 	
 	/** Like printf, but returns a string */
-	public static var sprintf:SfCore_sprintf = Reflect.makeVarArgs(sf.type.SfPrintf.sprintf);
+	#if (haxe >= "4.2")
+	public static function sprintf(format:String, params:Rest<Dynamic>):String {
+		var buf = new SfBuffer();
+		SfPrintf.proc(buf, format, params);
+		return buf.toString();
+	}
+	#else
+	public static var sprintf:SfCore_sprintf = Reflect.makeVarArgs(function(params:Array<Dynamic>):Dynamic {
+		var buf = new SfBuffer();
+		SfPrintf.proc(buf, null, params);
+		return buf.toString();
+	});
+	#end
 	
 	/** exception tag */
 	public static var xt:Dynamic = null;

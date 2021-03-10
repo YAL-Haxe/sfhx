@@ -105,11 +105,11 @@ class SfPrintf {
 		return out;
 	}
 	private static var cache:Map<String, Array<SfPrintfNode>> = new Map();
-	private static inline function runInner(params:Array<Dynamic>, buf:SfBuffer) {
+	public static inline function proc(buf:SfBuffer, fmt:String, params:Array<Dynamic>) {
 		var paramIndex = 0;
 		inline function next():Any return params[paramIndex++];
 		if (buf == null) buf = next();
-		var fmt:String = next();
+		if (fmt == null) fmt = next();
 		var tks = cache.get(fmt);
 		if (tks == null) {
 			tks = parse(fmt);
@@ -142,15 +142,6 @@ class SfPrintf {
 				}
 			};
 		}
-	}
-	public static function printf(params:Array<Dynamic>):Dynamic {
-		runInner(params, null);
-		return params[0];
-	}
-	public static function sprintf(params:Array<Dynamic>):Dynamic {
-		var buf = new SfBuffer();
-		runInner(params, buf);
-		return buf.toString();
 	}
 }
 enum SfPrintfNode {

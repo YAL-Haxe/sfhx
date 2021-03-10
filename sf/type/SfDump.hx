@@ -241,6 +241,7 @@ class SfDump {
 					case OpNot: printf(r, "!");
 					case OpNeg: printf(r, "-");
 					case OpNegBits: printf(r, "~");
+					case OpSpread: printf(r, "...");
 				}
 				if (!p) f(e);
 			}
