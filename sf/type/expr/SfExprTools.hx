@@ -528,6 +528,9 @@ class SfExprTools {
 	
 	/** Returns whether an expression should be fine on a single line. */
 	public static function isSmall(expr:SfExpr):Bool {
+		#if sfgml_verbose_brackets
+		return false;
+		#else
 		return switch (unpack(expr).def) {
 			case SfBlock(w): w.length == 0 || (w.length == 1 && isSmall(w[0]));
 			case SfIf(_, a, z, b): {
@@ -547,6 +550,7 @@ class SfExprTools {
 			case SfTry(_, _): false;
 			default: true;
 		}
+		#end
 	}
 	
 	/** Returns whether an expression is simple (no possible side effects) */
