@@ -631,7 +631,7 @@ class SfExprTools {
 	}
 	
 	/** !expr */
-	public static function invert(expr:SfExpr):SfExpr {
+	public static function invert(expr:SfExpr, nullIfNeedsWrap:Bool = false):SfExpr {
 		var rd = switch (unpack(expr).def) {
 			case SfConst(TBool(b)): SfConst(TBool(!b));
 			case SfBinop(OpEq, a, b): SfBinop(OpNotEq, a, b);
@@ -641,7 +641,9 @@ class SfExprTools {
 			case SfBinop(OpGt, a, b): SfBinop(OpLte, a, b);
 			case SfBinop(OpGte, a, b): SfBinop(OpLt, a, b);
 			case SfUnop(OpNot, false, a): a.def;
-			default: SfUnop(OpNot, false, expr);
+			default: 
+				if (nullIfNeedsWrap) return null;
+				SfUnop(OpNot, false, expr);
 		}
 		return expr.mod(rd);
 	}
