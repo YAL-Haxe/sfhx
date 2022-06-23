@@ -8,7 +8,7 @@ using sf.type.expr.SfExprTools;
 import SfTools.*;
 
 /**
- * 
+ * This is just me fighting the Haxe compiler over redundant code generation.
  * @author YellowAfterlife
  */
 class SfOptInlineBlock extends SfOptImpl {
@@ -204,8 +204,170 @@ class SfOptInlineBlock extends SfOptImpl {
 		if (!usesTern && fdTern != null) fdTern.isHidden = true;
 	}
 	
+	/** `{ var a = v; var b; b = a; b; }` -> `v` */
+	private function fixSimpleInlineJuggling() {
+		forEachExpr(function(e:SfExpr, w, f) {
+			e.iter(w, f);
+			switch (e.def) {
+				case SfBlock([
+					_.def => SfVarDecl(v10, true, r),
+					_.def => SfVarDecl(v20, false, _),
+					_.def => SfBinop(OpAssign, _.def => SfLocal(v21), _.def => SfLocal(v11)),
+					_.def => SfLocal(v22)
+				]) if (v10.equals(v11) && v20.equals(v21) && v20.equals(v22)): {
+					e.setTo(r.def);
+				};
+				default:
+			}
+		});
+	}
+	
+	/**
+	 * `some = { ...; value; }` -> `...; some = value;`
+	 * `return { ...; value; }` -> `...; return value;`
+	 */
+	private function fixSimpleInlineBlockAssign() {
+		forEachExpr(function(e:SfExpr, w, f) {
+			e.iter(w, f);
+			switch (e.def) {
+				case SfReturn(true, rv): {
+					var rvu = rv.unpack();
+					switch(rvu.def) {
+						case SfBlock(exprs):
+							var val = exprs[exprs.length - 1];
+							rvu.setTo(val.def);
+							val.setTo(SfReturn(true, rv));
+							e.setTo(SfBlock(exprs));
+						default:
+					}
+				};
+				case SfBinop(op = OpAssign | OpAssignOp(_), src, dst): {
+					var dstu = dst.unpack();
+					switch (dstu.def) {
+						case SfBlock(exprs): {
+							var value = exprs[exprs.length - 1];
+							dstu.setTo(value.def);
+							value.setTo(SfBinop(op, src, dst));
+							e.setTo(SfBlock(exprs));
+						};
+						default:
+					}
+				};
+				default:
+			}
+		});
+	}
+	
+	/** `while ({ ...; value}) expr;` -> `while (true) { ...; if (!value) break; expr; }` */
+	private function fixInlineWhileLoopConditionBlock() {
+		forEachExpr(function(e:SfExpr, w, f) {
+			e.iter(w, f);
+			switch (e.def) {
+				case SfWhile(cond, expr, true): {
+					var condu = cond.unpack();
+					switch (condu.def) {
+						case SfBlock(cexprs): {
+							var value = cexprs.pop();
+							cexprs.push(e.mod(SfIf(
+								e.mod(SfParenthesis(value.invert())),
+								e.mod(SfBreak), false, null)
+							));
+							condu.setTo(SfConst(TBool(true)));
+							e.setTo(SfWhile(cond, e.mod(SfBlock([
+								e.mod(SfBlock(cexprs)),
+								expr
+							])), true));
+						};
+						default:
+					};
+				}
+				default:
+			}
+		});
+	}
+	
+	/** `while (true) { ...; if (!expr) break; }` -> `do { ... } while (expr);` */
+	private function restoreDoWhile() {
+		forEachExpr(function(e:SfExpr, w:Array<SfExpr>, f) {
+			e.iter(w, f);
+			// `while (true) { ... }` ? 
+			var loop, exprs;
+			switch (e.def) {
+				case SfWhile(cond1, q = _.def => SfBlock(w), true): {
+					switch (cond1.def) {
+						case SfConst(TBool(true)): loop = q; exprs = w;
+						default: return;
+					}
+				}; default: return;
+			};
+			//
+			var count = exprs.length;
+			var cond = if (count > 0) switch (exprs[count - 1].def) {
+				case SfIf(c, _.def => SfBreak, false, _): {
+					var c1 = c.unpack();
+					switch (c1.def) {
+						case SfUnop(OpNot, false, c): c;
+						default: return;
+					}
+				};
+				default: return;
+			} else return;
+			//
+			exprs.pop();
+			e.def = SfWhile(cond, loop, false);
+		}, []);
+	}
+	
+	public static function fixRedundantBoolAssigns(e:SfExpr, w:Array<SfExpr>, f) {
+		e.iter(w, f);
+		switch (e.def) {
+			case SfIf(cond,
+				_.def => SfBinop(OpAssign, thenTarget, _.unpack().def => SfConst(TBool(true))),
+				true,
+				_.def => SfBinop(OpAssign, elseTarget, _.unpack().def => SfConst(TBool(false)))
+			): {
+				switch (cond.unpack().def) {
+					case SfBinop(OpEq | OpNotEq | OpGt | OpGte | OpLt | OpLte | OpBoolAnd | OpBoolOr, _, _): {};
+					default: return;
+				}
+				if (!thenTarget.equals(elseTarget)) return;
+				e.def = SfBinop(OpAssign, thenTarget, cond);
+				
+				// oh, but was it a `var tmp; if (x) tmp = true; else tmp = false; if (tmp)`?
+				var tempVar = switch (thenTarget.def) {
+					case SfLocal(_v) if (StringTools.startsWith(_v.name, "tmp")): _v;
+					default: return;
+				}
+				
+				//
+				var outer = w[0];
+				if (outer == null) return;
+				var outerExprs = switch (outer.def) {
+					case SfBlock(_exprs): _exprs;
+					default: return;
+				}
+				
+				//
+				var exprAt = outerExprs.indexOf(e);
+				if (exprAt <= 0 || exprAt >= outerExprs.length - 1) return;
+				
+				switch (outerExprs[exprAt - 1].def) {
+					case SfVarDecl(_v, false, _) if (_v.equals(tempVar)): {}
+					default: return;
+				}
+				
+				if (outer.countLocal(tempVar) != 2) return;
+				if (outerExprs[exprAt + 1].countLocal(tempVar) != 1) return;
+				outerExprs[exprAt + 1].replaceLocal(tempVar, cond);
+				outerExprs.splice(exprAt - 1, 2);
+			}
+			default:
+		}
+	}
+	
 	override public function apply() {
 		forEachExpr(fixInlinePrefixes, []);
+		forEachExpr(fixRedundantBoolAssigns, []);
 		// `var t = c ? a : b; r = t` -> `if (c) r = a; else r = b;`
 		forEachExpr(function(e:SfExpr, w, f) {
 			e.iter(w, f);
@@ -250,106 +412,10 @@ class SfOptInlineBlock extends SfOptImpl {
 		procTenary();
 		//
 		forEachExpr(fixInlinePairBlock, []);
-		// `{ var a = v; var b; b = a; b; }` -> `v`
-		forEachExpr(function(e:SfExpr, w, f) {
-			e.iter(w, f);
-			switch (e.def) {
-				case SfBlock([
-					_.def => SfVarDecl(v10, true, r),
-					_.def => SfVarDecl(v20, false, _),
-					_.def => SfBinop(OpAssign, _.def => SfLocal(v21), _.def => SfLocal(v11)),
-					_.def => SfLocal(v22)
-				]) if (v10.equals(v11) && v20.equals(v21) && v20.equals(v22)): {
-					e.setTo(r.def);
-				};
-				default:
-			}
-		});
-		// `some = { ...; value; }` -> `...; some = value;`
-		forEachExpr(function(e:SfExpr, w, f) {
-			e.iter(w, f);
-			switch (e.def) {
-				case SfReturn(true, rv): {
-					var rvu = rv.unpack();
-					switch(rvu.def) {
-						case SfBlock(exprs):
-							var val = exprs[exprs.length - 1];
-							rvu.setTo(val.def);
-							val.setTo(SfReturn(true, rv));
-							e.setTo(SfBlock(exprs));
-						default:
-					}
-				};
-				case SfBinop(op = OpAssign | OpAssignOp(_), src, dst): {
-					var dstu = dst.unpack();
-					switch (dstu.def) {
-						case SfBlock(exprs): {
-							var value = exprs[exprs.length - 1];
-							dstu.setTo(value.def);
-							value.setTo(SfBinop(op, src, dst));
-							e.setTo(SfBlock(exprs));
-						};
-						default:
-					}
-				};
-				default:
-			}
-		});
-		// `while ({ ...; value}) expr;` -> `while (true) { ...; if (!value) break; expr; }`
-		forEachExpr(function(e:SfExpr, w, f) {
-			e.iter(w, f);
-			switch (e.def) {
-				case SfWhile(cond, expr, true): {
-					var condu = cond.unpack();
-					switch (condu.def) {
-						case SfBlock(cexprs): {
-							var value = cexprs.pop();
-							cexprs.push(e.mod(SfIf(
-								e.mod(SfParenthesis(value.invert())),
-								e.mod(SfBreak), false, null)
-							));
-							condu.setTo(SfConst(TBool(true)));
-							e.setTo(SfWhile(cond, e.mod(SfBlock([
-								e.mod(SfBlock(cexprs)),
-								expr
-							])), true));
-						};
-						default:
-					};
-				}
-				default:
-			}
-		});
-		// `while (true) { ...; if (!expr) break; }` -> `do { ... } while (expr);`
-		var shown = false;
-		forEachExpr(function(e:SfExpr, w:Array<SfExpr>, f) {
-			e.iter(w, f);
-			// `while (true) { ... }` ? 
-			var loop, exprs;
-			switch (e.def) {
-				case SfWhile(cond1, q = _.def => SfBlock(w), true): {
-					switch (cond1.def) {
-						case SfConst(TBool(true)): loop = q; exprs = w;
-						default: return;
-					}
-				}; default: return;
-			};
-			//
-			var count = exprs.length;
-			var cond = if (count > 0) switch (exprs[count - 1].def) {
-				case SfIf(c, _.def => SfBreak, false, _): {
-					var c1 = c.unpack();
-					switch (c1.def) {
-						case SfUnop(OpNot, false, c): c;
-						default: return;
-					}
-				};
-				default: return;
-			} else return;
-			//
-			exprs.pop();
-			e.def = SfWhile(cond, loop, false);
-		}, []);
+		fixSimpleInlineJuggling();
+		fixSimpleInlineBlockAssign();
+		fixInlineWhileLoopConditionBlock();
+		restoreDoWhile();
 		forEachExpr(restoreBoolAndReturn);
 		forEachExpr(restoreBoolOrReturn);
 		forEachExpr(flipIfNot);

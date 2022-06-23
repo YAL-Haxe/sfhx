@@ -2,6 +2,7 @@ package sf.opt;
 
 import haxe.ds.Map;
 import sf.opt.SfOptImpl;
+import sf.opt.SfOptInlineBlock;
 import sf.type.expr.SfExprDef.*;
 import sf.type.*;
 import sf.type.expr.*;
@@ -153,6 +154,11 @@ class SfOptAutoVar extends SfOptImpl {
 		#if !sf_no_opt_auto_var
 		forEachExpr(mainIter, []);
 		forEachExpr(inlineIterOuter, []);
+		/*
+		We need a second pass with this since `if (e.match(E(_))) {}`
+		produces `var tmp; if (e.index == E) { var _g = e; ...; tmp = true; } else { tmp = false; }`
+		*/
+		forEachExpr(SfOptInlineBlock.fixRedundantBoolAssigns, []);
 		#end
 	}
 	
