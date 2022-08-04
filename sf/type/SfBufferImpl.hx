@@ -85,15 +85,18 @@ class SfBufferImpl extends SfBufferBase {
 			return;
 		}
 		var l = length;
-		var p = s.parentType.pack;
-		var n = p.length;
-		var i = 0;
-		while (i < n) {
-			addString(p[i]);
-			addChar(packSep);
-			i += 1;
-		}
-		addString(s.parentType.name);
+		var t = s.parentType;
+		if (t.exposePath == null) {
+			var p = t.pack;
+			var n = p.length;
+			var i = 0;
+			while (i < n) {
+				addString(p[i]);
+				addChar(packSep);
+				i += 1;
+			}
+			addString(t.name);
+		} else addString(t.exposePath);
 		if (length > l) addChar(dotSep);
 		addString(s.name);
 	}
