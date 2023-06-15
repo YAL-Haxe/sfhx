@@ -240,7 +240,6 @@ class SfTxConverter {
 						_.get() => { module: "js.Syntax" }, _.get() => fd
 					)): {
 						switch (fd.name) {
-							#if (sfjs)
 							case "construct": {
 								var c = f(m[0]);
 								var args = [];
@@ -254,7 +253,6 @@ class SfTxConverter {
 							case "delete": {
 								rd = SfDynamic("delete {0}[{1}]", [f(m[0]), f(m[1])]);
 							};
-							#end
 							case "instanceof": rd = SfInstanceOf(f(m[0]), f(m[1]));
 							case "typeof": rd = SfTypeOf(f(m[0]));
 							case "strictEq": rd = SfStrictEq(f(m[0]), f(m[1]));
