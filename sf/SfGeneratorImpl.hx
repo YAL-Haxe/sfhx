@@ -87,7 +87,9 @@ class SfGeneratorImpl {
 	public function typeFindReal<T:SfType>(path:String, ?kind:Class<T>, ?soft:Bool):T {
 		var r:T = cast realMap[path];
 		if (r == null && !soft) {
+			var dump = [for (key => _ in realMap) key];
 			Context.error('SfGeneratorImpl.typeFindReal: Couldn\'t find $path in AST.'
+				+ "\nAvailable types: " + dump.join(", ")
 				+ haxe.CallStack.toString(haxe.CallStack.callStack()), Context.currentPos());
 		}
 		return r;
