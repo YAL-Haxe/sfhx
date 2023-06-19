@@ -286,7 +286,7 @@ class SfDump {
 					r.addFieldPath(_field);
 				} else {
 					if (c != null) {
-						r.addTypePathAuto(c);
+						r.addTypePath(c, ".".code);
 					} else printf(r, "?");
 					printf(r, ".?");
 				}

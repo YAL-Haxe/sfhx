@@ -46,6 +46,7 @@ class SfExprTools {
 				case TNull: TNull;
 				case TSuper: TSuper;
 			});
+			case SfVarDecl(v, z, x): SfVarDecl(v, z, x != null ? x.clone() : null);
 			case SfLocal(v): SfLocal(v.clone());
 			case SfIdent(s): SfIdent(s);
 			case SfDynamic(s, w): SfDynamic(s, fx(w));

@@ -43,6 +43,9 @@ class SfConfigImpl {
 	/** Whether to generate SfCFor */
 	public var cfor:Bool = bool("sf-cfor", true);
 	
+	/** Are variables only available in their block (like `let` in JS)? */
+	public var blockScoping:Bool = false;
+	
 	/** Whether to generate SfInstanceOf (as opposed to JS-specific checks) */
 	public var instanceof:Bool = false;
 	
