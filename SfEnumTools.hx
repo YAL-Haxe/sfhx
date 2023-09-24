@@ -49,8 +49,8 @@ class SfEnumTools {
 		//return neko.NativeArray.length(asValue(q).args);
 	}
 	public static function setTo<T:EnumValue>(q:T, v:T):Void {
+		throw "Not implemented";
 		trace(q);
-		Sys.exit(0);
 		/*var qi = asValue(q);
 		var vi = asValue(v);
 		var vx = vi.args;
