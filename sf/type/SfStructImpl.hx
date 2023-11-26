@@ -130,6 +130,6 @@ class SfStructImpl {
 	}
 	
 	public function toString() {
-		return pack != null && pack.length > 0 ? pack.join(".") + name : name;
+		return pack != null && pack.length > 0 ? pack.join(".") + "." + realName : realName;
 	}
 }

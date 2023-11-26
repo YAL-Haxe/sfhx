@@ -179,4 +179,8 @@ class SfClassFieldImpl extends SfField {
 			} else out.addSemico();
 		}
 	}
+	
+	override public function toString():String {
+		return parentClass.toString() + "." + realName;
+	}
 }

@@ -57,6 +57,18 @@ class SfClassImpl extends SfType {
 		classType = t;
 		for (f in t.statics.get()) addField(new SfClassField(self, f, false));
 		for (f in t.fields.get()) addField(new SfClassField(self, f, true));
+		// ExampleJSGenerator doesn't do this..?
+		/*for (rf in t.overrides) {
+			var f = rf.get();
+			var cf = new SfClassField(self, f, true);
+			if (realMap.exists(cf.realName)) {
+				//trace("override field " + cf + " already exists");
+				continue;
+			}
+			trace("override field " + cf + " already exists");
+			addField(cf);
+		}*/
+		
 		if (t.constructor != null) {
 			constructor = new SfClassField(cast this, t.constructor.get(), false);
 		}
