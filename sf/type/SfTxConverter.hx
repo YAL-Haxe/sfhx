@@ -16,7 +16,25 @@ class SfTxConverter {
 		for (e in arr) out.push(typedExprToSfExpr(e));
 		return out;
 	}
-	
+	static function toStringSimple(e:TypedExpr):String {
+		return switch (e.expr) {
+			case TConst(TString(s)): s;
+			case TCall(_.expr => TField(
+				_.expr => TArrayDecl(arr),
+				FieldAccess.FInstance(_, _, _.get() => {name: "join"})
+			), [arg]): arr.map(toStringSimple).join(toStringSimple(arg));
+			//case TArrayDecl(arr): arr.map(toStringSimple).join("");
+			case TBinop(OpAdd, e1, e2): toStringSimple(e1) + toStringSimple(e2);
+			default: {
+				#if macro
+				haxe.macro.Context.error("fromTypedExpr: can't convert to string", e.pos);
+				null;
+				#else
+				throw "fromTypedExpr: can't convert to string @ " + e.pos;
+				#end
+			}
+		}
+	}
 	public static function typedExprToSfExpr(e:TypedExpr) {
 		if (e == null) return null;
 		inline function f(e1:TypedExpr):SfExpr {
@@ -201,10 +219,7 @@ class SfTxConverter {
 						#end
 						case "__js__" | "__raw__": {
 							if (m.length < 1) error(e, "Requires one or more arguments.");
-							sfStr = switch (m[0].expr) {
-								case TConst(TString(s)): s;
-								default: error(m[0], "Expected a String constant.");
-							};
+							sfStr = toStringSimple(m[0]);
 							sfExprs = [];
 							for (i in 1 ... m.length) sfExprs.push(f(m[i]));
 							rd = SfDynamic(sfStr, sfExprs);
