@@ -230,6 +230,7 @@ class SfExprTools {
 	}
 	
 	public static function dump(expr:SfExpr):String {
+		if (expr == null) return null;
 		var buf = new SfBuffer();
 		SfDump.expr(expr, buf);
 		return buf.toString();

@@ -40,7 +40,18 @@ class SfOptAutoVar extends SfOptImpl {
 	}
 	
 	public function mainIter(e:SfExpr, w:SfExprList, f:SfExprIter) {
-		e.iter(w, f);
+		switch (e.def) {
+			case SfCFor(init, cond, post, expr):
+				// don't try to merge expressions inside cfor inits,
+				// that can eat a variable declaration
+				if (w != null) w.unshift(expr);
+				f(post, w, f);
+				f(expr, w, f);
+				if (w != null) w.shift();
+			default:
+				e.iter(w, f);
+		}
+		
 		switch (e.def) {
 			case SfBlock([q = _.def => SfVarDecl(_, _, _)]): {
 				e.setTo(q.def);
