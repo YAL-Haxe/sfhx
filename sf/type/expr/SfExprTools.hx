@@ -610,7 +610,7 @@ class SfExprTools {
 		var n = stack.length;
 		var i = start;
 		while (i < n) {
-			var o = stack[i];
+			var o = stack[i++];
 			switch (o.def) {
 				case SfMeta(_, _), SfCast(_, _): {
 					q = o; continue;

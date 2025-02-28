@@ -126,7 +126,7 @@ class SfOptInlineBlock extends SfOptImpl {
 		}
 	}
 	
-	private function procTenary() {
+	private function procTernary() {
 		var typeBoot = SfCore.sfGenerator.typeBoot;
 		var fdTern = typeBoot != null ? typeBoot.staticMap["tern"] : null;
 		var usesTern = false;
@@ -409,7 +409,7 @@ class SfOptInlineBlock extends SfOptImpl {
 			} // while
 		});
 		// deinline simple ternary blocks:
-		procTenary();
+		procTernary();
 		//
 		forEachExpr(fixInlinePairBlock, []);
 		fixSimpleInlineJuggling();
