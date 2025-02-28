@@ -164,7 +164,7 @@ class SfDump {
 			}
 		}
 		switch (e.def) {
-			case null: r.addString("null");
+			case null: r.addString("<null>");
 			case SfConst(c): {
 				switch (c) {
 					case TBool(b): r.addString(b ? "true" : "false");

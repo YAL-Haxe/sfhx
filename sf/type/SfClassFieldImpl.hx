@@ -127,7 +127,7 @@ class SfClassFieldImpl extends SfField {
 			case FVar(AccInline, AccNever): printf(out, "inline ");
 			default:
 		}
-		if (isVar && !isCallable) {
+		if (kind.match(FieldKind.FVar(_, _))) {
 			printf(out, "var %s", name);
 			switch (classField.kind) {
 				case FVar(AccNormal, AccNormal): {};
