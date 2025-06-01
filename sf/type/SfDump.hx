@@ -118,13 +118,11 @@ class SfDump {
 					if (k > 0) printf(r, ", ");
 					var param = params[k];
 					switch (param.expr) {
-						case EConst(c): switch (c) {
-							case CInt(s)|CFloat(s)|CIdent(s): printf(r, "%s", s);
-							case CString(s): printf(r, '"%s"', s);
-							case CRegexp(s, o): printf(r, "~/%s/%s", s, o);
-							default: printf(r, "%s", c.getName());
-						};
+						case EConst(CInt(s)|CFloat(s)|CIdent(s)): r.addString(s);
+						case EConst(CString(s)): r.addString(haxe.Json.stringify(s));
+						case EConst(CRegexp(s, o)): printf(r, "~/%s/%s", s, o);
 						default: {
+							printf(r, "/* %s */ ", param.expr.getName());
 							printf(r, "%s", haxe.macro.ExprTools.toString(param));
 							//printf(r, "%s", params[k].expr.getName());
 						}
