@@ -108,6 +108,10 @@ class SfOptAutoVar extends SfOptImpl {
 			default:
 		}
 	}
+	function mainIterOuter(e:SfExpr, w:SfExprList, f:SfExprIter) {
+		if (currentField != null && currentField.meta.has(":sf_no_opt_auto_var")) return;
+		mainIter(e, w, mainIter);
+	}
 	
 	private var inlineVarData:Map<String, { expr:SfExpr, val:SfExpr, par:SfExpr }>;
 	public function inlineIter(expr:SfExpr, st:SfExprList, it:SfExprIter) {
@@ -163,7 +167,7 @@ class SfOptAutoVar extends SfOptImpl {
 	
 	override public function apply() {
 		#if !sf_no_opt_auto_var
-		forEachExpr(mainIter, []);
+		forEachExpr(mainIterOuter, []);
 		forEachExpr(inlineIterOuter, []);
 		/*
 		We need a second pass with this since `if (e.match(E(_))) {}`
