@@ -87,11 +87,9 @@ class SfClassFieldImpl extends SfField {
 						sfArgs = [];
 						for (f_arg in f.args) sfArgs.push(SfArgumentImpl.fromTyped(f_arg));
 						type = f.t;
-						switch (kind) {
-							case FMethod(mk): {
-								typedExpr = f.expr;
-							};
-							default:
+						// for functions, we want .expr to be the function body
+						if (kind.match(FMethod(_))) {
+							typedExpr = f.expr;
 						}
 					};
 					default:
